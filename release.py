@@ -18,6 +18,17 @@ for dir_name in os.listdir(ROOT_DIR):
             projects.append(dir_path)
 
 # Ask user for project to sync
-for project in projects:
-    print project
+if len(projects) > 0:
+    print "Please select a project to sync\n"
+    for i, project in enumerate(projects):
+        print "    ["+str(i)+"]" + " " + project
+
+    project_index = int(raw_input("?")) # Blindly parse input
+
+    if project_index >= 0 and project_index < len(projects):
+        # Here goes the thing
+    else:
+        print "I won't take that as an answer"
+else:
+    print "No suitable project found in " + ROOT_DIR
 
