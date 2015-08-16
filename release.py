@@ -5,7 +5,7 @@ import json
 import sys
 from subprocess import call
 
-ROOT_DIR = "/var/www/html/"
+ROOT_DIR = "/var/www/"
 CONFIG_FILE_NAME = "deployment.conf"
 
 
@@ -38,7 +38,8 @@ for dir_name in os.listdir(ROOT_DIR):
 if len(projects) > 0:
     print "Please select a project to sync\n"
     for i, project in enumerate(projects):
-        print "    ["+str(i)+"]" + " " + project
+        project_name = os.path.basename(os.path.normpath(project))
+        print "    ["+str(i)+"]" + " " + project_name
 
     project_index = int(raw_input("?")) # Blindly parse input
 
@@ -46,7 +47,7 @@ if len(projects) > 0:
         # Here goes the thing
         project = projects[project_index]
 
-        # Configuration file parsing
+        # Parse conf
         conf_raw = open(project + "/" + CONFIG_FILE_NAME, "r").read()
         conf = json.loads(conf_raw)
 
