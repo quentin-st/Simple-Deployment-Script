@@ -13,7 +13,7 @@ Each project should contain the following file in its root directory:
         "passes":       "do_something -but_not_that"
     }
 
-To use the project, copy the file an edit it:
+To use the project, clone this repository everywhere, copy the sample configuration file an edit it:
 
     cp ~/simple-deployment-script/sample-deploy.conf.json /var/www/project/deploy.conf.json
     vim /path/to/project/deploy.json.conf
