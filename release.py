@@ -3,10 +3,7 @@
 import os
 import json
 import sys
-from subprocess import call
-
-ROOT_DIR = "/var/www/"
-CONFIG_FILE_NAME = "release.conf"
+from config import ROOT_DIR, CONFIG_FILE_NAME
 
 
 # Here goes the functions
