@@ -12,6 +12,10 @@ Each project should contain the following file in its root directory:
         "branch" :      "release"
     }
 
+To use the project, copy the file an edit it:
+
+    cp ~/simple-deployment-script/sample-deploy.conf.json /var/www/project/deploy.conf.json
+    vim /path/to/project/deploy.json.conf
 
 *Here are the configuration keys:*
 
