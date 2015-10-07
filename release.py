@@ -6,7 +6,7 @@ import sys
 from subprocess import call
 
 ROOT_DIR = "/var/www/"
-CONFIG_FILE_NAME = "deployment.conf"
+CONFIG_FILE_NAME = "release.conf"
 
 
 # Here goes the functions
