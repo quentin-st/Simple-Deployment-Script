@@ -45,10 +45,8 @@ def release(project_path):
 
     # Symfony2-specific commands
     if project_type == "symfony2":
-        os.system("composer install")
-        # Install assets
+        os.system("composer -n install --optimize-autoloader")
         os.system("php app/console assets:install")
-        # Clear cache
         os.system("php app/console cache:clear -e prod")
         os.system("php app/console assetic:dump -e prod")
 
