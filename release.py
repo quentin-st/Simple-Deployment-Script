@@ -21,6 +21,40 @@ def parse_conf(file_path):
     return json.loads(conf_raw)
 
 
+def release(project_path):
+    # Parse conf
+    conf = parse_conf(project_path + "/" + CONFIG_FILE_NAME)
+
+    # Read conf
+    project_type = read_conf(conf, "projectType", "vanilla")
+    branch = read_conf(conf, "branch", "release")
+
+    # Check the project type
+    valid_types = ["vanilla", "symfony2"]
+    if project_type not in valid_types:
+        print("Unknown project type...")
+        sys.exit(1)
+
+    # Let's go!
+    os.chdir(project_path)
+    # Checkout release branch
+    os.system("git checkout " + branch)
+    # Pull changes
+    os.system("git pull")
+
+    # Symfony2-specific commands
+    if project_type == "symfony2":
+        # Install assets
+        os.system("php app/console assets:install")
+        # Clear cache
+        os.system("php app/console cache:clear")
+
+    # Restore files ownership for new files
+    os.system("chown -R www-data:www-data " + project_path)
+
+    print("Release finished. Have an A1 day!")
+
+
 # Here goes the code
 
 projects = []
@@ -51,37 +85,7 @@ if len(projects) > 0:
         # Here goes the thing
         project = projects[project_index]
 
-        # Parse conf
-        conf = parse_conf(project + "/" + CONFIG_FILE_NAME)
-
-        # Read conf        
-        project_type = read_conf(conf, "projectType", "vanilla")
-        branch = read_conf(conf, "branch", "release")
-
-        # Check the project type
-        valid_types = ["vanilla", "symfony2"]
-        if project_type not in valid_types:
-            print("Unknown project type...")
-            sys.exit(1)
-
-        # Let's go!
-        os.chdir(project)
-        # Checkout release branch
-        os.system("git checkout " + branch)
-        # Pull changes
-        os.system("git pull")
-
-        # Symfony2-specific commands
-        if project_type == "symfony2":
-            # Install assets
-            os.system("php app/console assets:install")
-            # Clear cache
-            os.system("php app/console cache:clear")
-
-        # Restore files ownership for new files
-        os.system("chown -R www-data:www-data " + project)
-
-        print("Release finished. Have an A1 day!")
+        release(project)
     else:
         print("I won't take that as an answer")
 else:
