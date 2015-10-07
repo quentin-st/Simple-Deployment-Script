@@ -50,6 +50,7 @@ def release(project_path):
         os.system("php app/console assets:install")
         # Clear cache
         os.system("php app/console cache:clear -e prod")
+        os.system("php app/console assetic:dump -e prod")
 
     print("Release finished. Have an A1 day!")
 
