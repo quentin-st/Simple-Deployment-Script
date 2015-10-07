@@ -79,7 +79,14 @@ if len(projects) > 0:
 
         print("    [" + str(i) + "]" + " " + project_name + " (" + target_branch + ")")
 
-    project_index = int(input("?"))  # Blindly parse input
+    project_index = -1
+    is_valid = 0
+    while not is_valid:
+        try:
+            project_index = int(input("? "))
+            is_valid = 1
+        except ValueError:
+            print("Not a valid integer.")
 
     if 0 <= project_index < len(projects):
         # Here goes the thing
