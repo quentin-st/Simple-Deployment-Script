@@ -2,10 +2,10 @@
 
 This simple python script can be used to manage Git-managed websites/projects on a production server.
 
-## deployment.conf
+## release.conf
 Each project should contain the following file in its root directory:
 
-    # deployment.conf
+    # release.conf
 
     {
         "projectType":  "symfony2",
@@ -39,12 +39,11 @@ All you have to do is to run `python release.py`:
     root@server:~/deploy# python release.py
     Please select a project to sync
 
-        [0] project1
-        [1] project2
-        [2] project3
-        [3] project4
-    ?1
+        [0] project1 (master)
+        [1] project2 (release)
+        [2] project3 (release)
+        [3] project4 (pre-prod)
+    ? 1
     Already on 'release'
     Already up-to-date.
     Release finished. Have an A1 day!
-
