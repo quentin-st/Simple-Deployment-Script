@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import os
 import json
@@ -8,12 +8,11 @@ from config import ROOT_DIR, CONFIG_FILE_NAME
 
 # Here goes the functions
 def read_conf(array, key, default_value):
-    "Returns the value for a conf key. If not found, returns the default_value"
+    """Returns the value for a conf key. If not found, returns the default_value"""
     if key in array:
         return array[key]
     else:
         return default_value
-
 
 
 # Here goes the code
@@ -33,14 +32,14 @@ for dir_name in os.listdir(ROOT_DIR):
 
 # Ask user for project to sync
 if len(projects) > 0:
-    print "Please select a project to sync\n"
+    print("Please select a project to sync\n")
     for i, project in enumerate(projects):
         project_name = os.path.basename(os.path.normpath(project))
-        print "    ["+str(i)+"]" + " " + project_name
+        print("    [" + str(i) + "]" + " " + project_name)
 
-    project_index = int(raw_input("?")) # Blindly parse input
+    project_index = int(input("?"))  # Blindly parse input
 
-    if project_index >= 0 and project_index < len(projects):
+    if 0 <= project_index < len(projects):
         # Here goes the thing
         project = projects[project_index]
 
@@ -54,8 +53,8 @@ if len(projects) > 0:
 
         # Check the project type
         valid_types = ["vanilla", "symfony2"]
-        if not project_type in valid_types:
-            print "Unknown project type..."
+        if project_type not in valid_types:
+            print("Unknown project type...")
             sys.exit(1)
 
         # Let's go!
@@ -74,10 +73,9 @@ if len(projects) > 0:
 
         # Restore files ownership for new files
         os.system("chown -R www-data:www-data " + project)
-        
-        print "Release finished. Have an A1 day!"
+
+        print("Release finished. Have an A1 day!")
     else:
-        print "I won't take that as an answer"
+        print("I won't take that as an answer")
 else:
-    print "No suitable project found in " + ROOT_DIR
-    
+    print("No suitable project found in " + ROOT_DIR)
