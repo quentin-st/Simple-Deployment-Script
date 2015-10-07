@@ -15,6 +15,12 @@ def read_conf(array, key, default_value):
         return default_value
 
 
+def parse_conf(file_path):
+    """Returns a JSON representation of the configuration file whose path is given as argument"""
+    conf_raw = open(file_path, "r").read()
+    return json.loads(conf_raw)
+
+
 # Here goes the code
 
 projects = []
@@ -35,7 +41,9 @@ if len(projects) > 0:
     print("Please select a project to sync\n")
     for i, project in enumerate(projects):
         project_name = os.path.basename(os.path.normpath(project))
-        print("    [" + str(i) + "]" + " " + project_name)
+        target_branch = read_conf(parse_conf(project + "/" + CONFIG_FILE_NAME), "branch", "release")
+
+        print("    [" + str(i) + "]" + " " + project_name + " (" + target_branch + ")")
 
     project_index = int(input("?"))  # Blindly parse input
 
@@ -44,8 +52,7 @@ if len(projects) > 0:
         project = projects[project_index]
 
         # Parse conf
-        conf_raw = open(project + "/" + CONFIG_FILE_NAME, "r").read()
-        conf = json.loads(conf_raw)
+        conf = parse_conf(project + "/" + CONFIG_FILE_NAME)
 
         # Read conf        
         project_type = read_conf(conf, "projectType", "vanilla")
