@@ -47,3 +47,11 @@ All you have to do is to run `python release.py`:
     Already on 'release'
     Already up-to-date.
     Release finished. Have an A1 day!
+
+## Permissions
+You have to properly setup permissions in order to avoid errors:
+
+    cd /path/to/project
+    HTTPDUSER=`ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
+    sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
+    sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs

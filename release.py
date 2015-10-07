@@ -3,6 +3,7 @@
 import os
 import json
 import sys
+import subprocess
 from config import ROOT_DIR, CONFIG_FILE_NAME
 
 
@@ -49,9 +50,6 @@ def release(project_path):
         os.system("php app/console assets:install")
         # Clear cache
         os.system("php app/console cache:clear -e prod")
-
-    # Restore files ownership for new files
-    os.system("chown -R www-data:www-data " + project_path)
 
     print("Release finished. Have an A1 day!")
 
