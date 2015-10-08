@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import os
+import os, sys, inspect
 import json
-import sys
-import subprocess
+from utils import stdio
+from utils.stdio import CRESET, CBOLD, LGREEN
+import technologies
+from technologies import *
 from config import ROOT_DIR, CONFIG_FILE_NAME
 
-
 # Here goes the functions
+
 def read_conf(array, key, default_value):
     """Returns the value for a conf key. If not found, returns the default_value"""
     if key in array:
@@ -15,12 +17,19 @@ def read_conf(array, key, default_value):
     else:
         return default_value
 
-
 def parse_conf(file_path):
     """Returns a JSON representation of the configuration file whose path is given as argument"""
     conf_raw = open(file_path, "r").read()
     return json.loads(conf_raw)
 
+def get_supported_technologies():
+    """Registers the supported technologies"""
+    techs = {}
+    for tech_pkg_name, tech_pkg in inspect.getmembers(technologies, inspect.ismodule):
+        tech_variants = tech_pkg.register_technologies()
+        for tech_variant in tech_variants:
+            techs[tech_variant.key_name] = tech_variant
+    return techs
 
 def release(project_path):
     # Parse conf
@@ -29,28 +38,47 @@ def release(project_path):
     # Read conf
     project_type = read_conf(conf, "projectType", "vanilla")
     branch = read_conf(conf, "branch", "release")
+    forced_passes = read_conf(conf, "passes", "").split()
 
     # Check the project type
-    valid_types = ["vanilla", "symfony2"]
-    if project_type not in valid_types:
-        print("Unknown project type...")
+    techs = get_supported_technologies()
+    if project_type not in techs:
+        print("Unknown project type \"{}\".".format(project_type))
         sys.exit(1)
 
     # Let's go!
     os.chdir(project_path)
-    # Checkout release branch
     os.system("git checkout " + branch)
-    # Pull changes
     os.system("git pull")
 
-    # Symfony2-specific commands
-    if project_type == "symfony2":
-        os.system("composer -n install --optimize-autoloader")
-        os.system("php app/console assets:install")
-        os.system("php app/console cache:clear -e prod")
-        os.system("php app/console assetic:dump -e prod")
+    # Determine env-specific passes
+    tech = techs[project_type]()
 
-    print("Release finished. Have an A1 day!")
+    deploy_passes = []
+
+    for pass_name in tech.register_passes():
+        # Check if optional task is enabled
+        if pass_name[0] == "?":
+            pass_name = pass_name[1:]
+            if pass_name not in forced_passes:
+                continue
+        # Check if pass is enabled
+        if "-"+pass_name in forced_passes:
+            continue
+
+        deploy_passes.append(pass_name)
+
+    print(CBOLD+LGREEN, "\n==> Deployment starting with passes: {}".format(", ".join(deploy_passes)), CRESET)
+
+    # Start env-specific passes
+    npasses = len(deploy_passes)
+    for i, pass_name in enumerate(deploy_passes):
+        print(CBOLD, "\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CRESET)
+        getattr(tech, pass_name + "_pass")()
+
+    # The End
+    print(CBOLD+LGREEN, "\n==> Deployment is successful. Have an A1 day!\n", CRESET)
+
 
 
 # Here goes the code
@@ -70,12 +98,12 @@ for dir_name in os.listdir(ROOT_DIR):
 
 # Ask user for project to sync
 if len(projects) > 0:
-    print("Please select a project to sync\n")
+    print("Please select a project to sync")
     for i, project in enumerate(projects):
         project_name = os.path.basename(os.path.normpath(project))
-        target_branch = read_conf(parse_conf(project + "/" + CONFIG_FILE_NAME), "branch", "release")
+        target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
 
-        print("    [" + str(i) + "]" + " " + project_name + " (" + target_branch + ")")
+        print("\t[{}] {} ({})".format(str(i), project_name, target_branch))
 
     project_index = -1
     is_valid = 0
