@@ -24,12 +24,12 @@ def parse_conf(file_path):
 
 def get_supported_project_types():
     """Registers the supported project types"""
-    plugins = {}
+    plugins_list = {}
     for plugin_pkg_name, plugin_pkg in inspect.getmembers(plugins, inspect.ismodule):
         plugin_variants = plugin_pkg.register_variants()
         for plugin_variant in plugin_variants:
-            plugins[plugin_variant.key_name] = plugin_variant
-    return plugins
+            plugins_list[plugin_variant.key_name] = plugin_variant
+    return plugins_list
 
 def release(project_path):
     # Parse conf
