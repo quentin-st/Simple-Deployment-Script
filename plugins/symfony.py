@@ -7,7 +7,7 @@ def register_variants():
 
 class Symfony:
     def register_passes(self):
-        return ['composer', '?assets', 'cache']
+        return ['composer', 'assets', 'cache']
 
     def composer_pass(self):
         if os.path.isfile("composer.phar"):
