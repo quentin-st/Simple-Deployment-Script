@@ -1,7 +1,7 @@
 import os
 from utils import stdio
 
-def register_technologies():
+def register_variants():
     return [Symfony2, Symfony3]
 
 

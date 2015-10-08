@@ -4,8 +4,8 @@ import os, sys, inspect
 import json
 from utils import stdio
 from utils.stdio import CRESET, CBOLD, LGREEN
-import technologies
-from technologies import *
+import plugins
+from plugins import *
 from config import ROOT_DIR, CONFIG_FILE_NAME
 
 # Here goes the functions
@@ -22,14 +22,14 @@ def parse_conf(file_path):
     conf_raw = open(file_path, "r").read()
     return json.loads(conf_raw)
 
-def get_supported_technologies():
-    """Registers the supported technologies"""
-    techs = {}
-    for tech_pkg_name, tech_pkg in inspect.getmembers(technologies, inspect.ismodule):
-        tech_variants = tech_pkg.register_technologies()
-        for tech_variant in tech_variants:
-            techs[tech_variant.key_name] = tech_variant
-    return techs
+def get_supported_project_types():
+    """Registers the supported project types"""
+    plugins = {}
+    for plugin_pkg_name, plugin_pkg in inspect.getmembers(plugins, inspect.ismodule):
+        plugin_variants = plugin_pkg.register_variants()
+        for plugin_variant in plugin_variants:
+            plugins[plugin_variant.key_name] = plugin_variant
+    return plugins
 
 def release(project_path):
     # Parse conf
@@ -41,8 +41,8 @@ def release(project_path):
     forced_passes = read_conf(conf, "passes", "").split()
 
     # Check the project type
-    techs = get_supported_technologies()
-    if project_type not in techs:
+    types = get_supported_project_types()
+    if project_type not in types:
         print("Unknown project type \"{}\".".format(project_type))
         sys.exit(1)
 
@@ -51,12 +51,12 @@ def release(project_path):
     os.system("git checkout " + branch)
     os.system("git pull")
 
-    # Determine env-specific passes
-    tech = techs[project_type]()
+    # Determine plugin-specific passes
+    plugin = types[project_type]()
 
     deploy_passes = []
 
-    for pass_name in tech.register_passes():
+    for pass_name in plugin.register_passes():
         # Check if optional task is enabled
         if pass_name[0] == "?":
             pass_name = pass_name[1:]
@@ -74,7 +74,7 @@ def release(project_path):
     npasses = len(deploy_passes)
     for i, pass_name in enumerate(deploy_passes):
         print(CBOLD, "\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CRESET)
-        getattr(tech, pass_name + "_pass")()
+        getattr(plugin, pass_name + "_pass")()
 
     # The End
     print(CBOLD+LGREEN, "\n==> Deployment is successful. Have an A1 day!\n", CRESET)

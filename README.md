@@ -2,7 +2,7 @@
 
 This simple python script can be used to manage Git-managed websites/projects on a production server.
 
-## deploy.conf
+## deploy.conf.json
 Each project should contain the following file in its root directory:
 
     # deploy.conf.json
@@ -13,10 +13,10 @@ Each project should contain the following file in its root directory:
         "passes":       "do_something -but_not_that"
     }
 
-To use the project, clone this repository everywhere, copy the sample configuration file an edit it:
+To use the project, clone this repository anywhere, copy the sample configuration file in each of your projects an edit it:
 
     cp ~/simple-deployment-script/sample-deploy.conf.json /var/www/project/deploy.conf.json
-    vim /path/to/project/deploy.json.conf
+    vim /path/to/project/deploy.conf.json
 
 *Here are the configuration keys (all keys are optional):*
 
@@ -42,7 +42,10 @@ To use the project, clone this repository everywhere, copy the sample configurat
 
     The deployment passes to force or avoid.
 
-    Each plugin that provides a technology integration is composed of one or more _passes_: these are the steps of the deployment. A plugin can mark a pass to not be executed by default (please refer to the plugin's documentation). If you want to execute that type of pass, you have to specify that here. You can also force-disable a pass that the plugin executes by default by putting a minus symbol (**-**) just before the pass name.
+    Each plugin that provides a project type integration is composed of one or more _passes_: these are the steps of
+    the deployment. A plugin can mark a pass to not be executed by default (please refer to the plugin's documentation).
+    If you want to execute that type of pass, you have to specify that here. You can also force-disable a pass that the
+    plugin executes by default by putting a minus symbol (**-**) just before the pass name.
 
     The syntax of this value is dead simple, write the passes you want to disable or enable, separate them by a space.
 
@@ -66,7 +69,7 @@ All you have to do is to run `./deploy.py`:
     Already up-to-date.
     Release finished. Have an A1 day!
 
-## Environment-specific recommandations & Plugins
+## Environment-specific recommendations & plugins
 
 ### Symfony 2 and 3
 
