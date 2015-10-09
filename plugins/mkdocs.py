@@ -14,5 +14,5 @@ class MkDocs:
         stdio.ppexec("mkdocs build --clean")
 
     # Put back files originally present in site/ dir and deleted by mkdocs
-    def overwrite_site(self):
+    def checkout_dash_dash_site_pass(self):
         stdio.ppexec("git checkout -- site")
