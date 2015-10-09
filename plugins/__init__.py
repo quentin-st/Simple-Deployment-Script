@@ -1,1 +1,1 @@
-__all__ = ['symfony']
+__all__ = ['symfony', 'generic']
