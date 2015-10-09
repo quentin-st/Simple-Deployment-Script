@@ -69,6 +69,10 @@ All you have to do is to run `./deploy.py`:
     Already up-to-date.
     Release finished. Have an A1 day!
 
+You can also specify the project you want to deploy as a command line argument:
+
+    root@server:~/simple-deployment-script# ./deploy.py --project project1
+
 ## Environment-specific recommendations & plugins
 
 ### Symfony 2 and 3

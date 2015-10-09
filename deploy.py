@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import os, sys, inspect
+import argparse
+import os
+import sys
+import inspect
 import json
 from utils import stdio
 from utils.stdio import CRESET, CBOLD, LGREEN
@@ -98,28 +101,42 @@ for dir_name in os.listdir(ROOT_DIR):
 
 # Ask user for project to sync
 if len(projects) > 0:
-    print("Please select a project to sync")
-    for i, project in enumerate(projects):
-        project_name = os.path.basename(os.path.normpath(project))
-        target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
+    # Check command line argument
+    parser = argparse.ArgumentParser(description='Easily deploy projects')
+    parser.add_argument('--project', default='ask_for_it')
+    args = parser.parse_args()
 
-        print("\t[{}] {} ({})".format(str(i), project_name, target_branch))
+    if args.project == 'ask_for_it':
+        print("Please select a project to sync")
+        for i, project in enumerate(projects):
+            project_name = os.path.basename(os.path.normpath(project))
+            target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
 
-    project_index = -1
-    is_valid = 0
-    while not is_valid:
-        try:
-            project_index = int(input("? "))
-            is_valid = 1
-        except ValueError:
-            print("Not a valid integer.")
+            print("\t[{}] {} ({})".format(str(i), project_name, target_branch))
 
-    if 0 <= project_index < len(projects):
-        # Here goes the thing
-        project = projects[project_index]
+        project_index = -1
+        is_valid = 0
+        while not is_valid:
+            try:
+                project_index = int(input("? "))
+                is_valid = 1
+            except ValueError:
+                print("Not a valid integer.")
 
-        release(project)
+        if 0 <= project_index < len(projects):
+            # Here goes the thing
+            project = projects[project_index]
+
+            release(project)
+        else:
+            print("I won't take that as an answer")
     else:
-        print("I won't take that as an answer")
+        # Deploy project passed as argument
+        project_path = ROOT_DIR + args.project
+
+        if project_path in projects:
+            release(project_path)
+        else:
+            print("Project not found")
 else:
     print("No suitable project found in " + ROOT_DIR)
