@@ -11,4 +11,4 @@ class MkDocs:
         return ['build']
 
     def build_pass(self):
-        stdio.ppexec("mkdocs build--clean")
+        stdio.ppexec("mkdocs build --clean")
