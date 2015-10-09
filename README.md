@@ -89,3 +89,9 @@ This will give write rights to your HTTP server on the Symfony log and cache fil
 | composer           | ✓                  | Runs `composer install`                                           |
 | assets             |                    | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
 | cache              | ✓                  | Clears the cache                                                  |
+
+### Other plugins
+Here are the other available plugins shipped with this script:
+
+- Mkdocs, see [Mkdocs website](http://www.mkdocs.org/) to learn more about this tool
+- Generic: passes-less plugin. Use this if you don't have anything to process after having pulled.
