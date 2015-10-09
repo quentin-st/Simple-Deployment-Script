@@ -8,7 +8,11 @@ class MkDocs:
     key_name = "mkdocs"
 
     def register_passes(self):
-        return ['build']
+        return ['build', '?checkout_dash_dash_site']
 
     def build_pass(self):
         stdio.ppexec("mkdocs build --clean")
+
+    # Put back files originally present in site/ dir and deleted by mkdocs
+    def overwrite_site(self):
+        stdio.ppexec("git checkout -- site")
