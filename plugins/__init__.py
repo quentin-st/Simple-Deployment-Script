@@ -1,1 +1,1 @@
-__all__ = ['symfony', 'generic']
+__all__ = ['symfony', 'generic', 'mkdocs']

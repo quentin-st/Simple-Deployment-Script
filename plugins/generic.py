@@ -1,5 +1,3 @@
-import os
-from utils import stdio
 
 def register_variants():
     return [Generic]
