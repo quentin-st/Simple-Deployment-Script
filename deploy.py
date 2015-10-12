@@ -63,7 +63,7 @@ def release(project_path):
         # Check if optional task is enabled
         if pass_name[0] == "?":
             pass_name = pass_name[1:]
-            if pass_name not in forced_passes:
+            if "+"+pass_name not in forced_passes:
                 continue
         # Check if pass is enabled
         if "-"+pass_name in forced_passes:

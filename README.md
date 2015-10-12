@@ -49,7 +49,9 @@ To use the project, clone this repository anywhere, copy the sample configuratio
 
     The syntax of this value is dead simple, write the passes you want to disable or enable, separate them by a space.
 
-    **Example:** `"passes": "-pass_a pass_b"` This will force-disable _pass_a_ and force-enable _pass_b_.
+    **Example:** `"passes": "-pass_a +pass_b"` This will force-disable _pass_a_ and force-enable _pass_b_.
+
+    If you specify a pass that doesn't exists, it is ignored.
 
     **Type**: `string`
     **Default value**: `""`
@@ -77,6 +79,12 @@ You can also specify the project you want to deploy as a command line argument:
 
 ### Symfony 2 and 3
 
+| Pass name & order  | Enabled by default | Description                                                       |
+| ------------------ | ------------------ | ----------------------------------------------------------------- |
+| composer           | ✓                  | Runs `composer install`                                           |
+| assets             | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
+| cache              | ✓                  | Clears the cache                                                  |
+
 You have to properly setup permissions in order to avoid errors. You could use the ACLs (a more advanced way to manage permissions than POSIX file modes):
 
     cd /path/to/project
@@ -87,12 +95,6 @@ You have to properly setup permissions in order to avoid errors. You could use t
 In Symfony 3, replace `app/cache` with `var/cache` and `app/logs` with `var/logs`.
 
 This will give write rights to your HTTP server on the Symfony log and cache files, while your own permissions are left intact.
-
-| Pass name & order  | Enabled by default | Description                                                       |
-| ------------------ | ------------------ | ----------------------------------------------------------------- |
-| composer           | ✓                  | Runs `composer install`                                           |
-| assets             | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
-| cache              | ✓                  | Clears the cache                                                  |
 
 ### Other plugins
 Here are the other available plugins shipped with this script:
