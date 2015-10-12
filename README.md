@@ -91,7 +91,7 @@ This will give write rights to your HTTP server on the Symfony log and cache fil
 | Pass name & order  | Enabled by default | Description                                                       |
 | ------------------ | ------------------ | ----------------------------------------------------------------- |
 | composer           | ✓                  | Runs `composer install`                                           |
-| assets             |                    | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
+| assets             | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
 | cache              | ✓                  | Clears the cache                                                  |
 
 ### Other plugins
