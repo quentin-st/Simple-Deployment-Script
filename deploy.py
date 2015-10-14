@@ -80,7 +80,7 @@ def release(project_path):
         getattr(plugin, pass_name + "_pass")()
 
     # The End
-    print(CBOLD+LGREEN, "\n==> Deployment is successful. Have an A1 day!\n", CRESET)
+    print(CBOLD+LGREEN, "\n==> " + project_path + " successfully deployed. Have an A1 day!\n", CRESET)
 
 
 
