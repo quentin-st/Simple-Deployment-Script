@@ -10,7 +10,7 @@ Each project should contain the following file in its root directory:
     {
         "projectType":  "symfony2",
         "branch":       "release",
-        "passes":       "do_something -but_not_that"
+        "passes":       "+do_something -but_not_that"
     }
 
 To use the project, clone this repository anywhere, copy the sample configuration file in each of your projects an edit it:
