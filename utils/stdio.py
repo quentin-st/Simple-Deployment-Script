@@ -12,6 +12,6 @@ def ppexec(cmd):
     p = Popen(cmd, stdout = PIPE, stderr = STDOUT, shell = True)
     for line in p.stdout:
         line = line.strip()
-        if(line == empty_line): return
+        if(line == empty_line): continue
         print(CDIM, "   " + line.decode("utf-8"), CRESET)
 
