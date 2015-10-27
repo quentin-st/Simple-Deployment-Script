@@ -73,7 +73,12 @@ All you have to do is to run `./deploy.py`:
 
 You can also specify the project you want to deploy as a command line argument:
 
-    root@server:~/simple-deployment-script# ./deploy.py --project project1
+    ./deploy.py --project project1
+
+or even use `--all` (or `-a`) to deploy all projects:
+
+    ./deploy.py --all
+
 
 ## Environment-specific recommendations & plugins
 
