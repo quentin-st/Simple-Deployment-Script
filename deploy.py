@@ -13,6 +13,7 @@ from config import ROOT_DIR, CONFIG_FILE_NAME
 
 # Here goes the functions
 
+
 def read_conf(array, key, default_value):
     """Returns the value for a conf key. If not found, returns the default_value"""
     if key in array:
@@ -20,10 +21,12 @@ def read_conf(array, key, default_value):
     else:
         return default_value
 
+
 def parse_conf(file_path):
     """Returns a JSON representation of the configuration file whose path is given as argument"""
     conf_raw = open(file_path, "r").read()
     return json.loads(conf_raw)
+
 
 def get_supported_project_types():
     """Registers the supported project types"""
@@ -33,6 +36,7 @@ def get_supported_project_types():
         for plugin_variant in plugin_variants:
             plugins_list[plugin_variant.key_name] = plugin_variant
     return plugins_list
+
 
 def release(project_path):
     # Parse conf
@@ -47,7 +51,7 @@ def release(project_path):
     types = get_supported_project_types()
     if project_type not in types:
         print("Unknown project type \"{}\".".format(project_type))
-        sys.exit(1)
+        return
 
     # Let's go!
     os.chdir(project_path)
@@ -80,7 +84,7 @@ def release(project_path):
         getattr(plugin, pass_name + "_pass")()
 
     # The End
-    print(CBOLD+LGREEN, "\n==> " + project_path + " successfully deployed. Have an A1 day!\n", CRESET)
+    print(CBOLD+LGREEN, "\n==> {} successfully deployed. Have an A1 day!\n".format(project_path), CRESET)
 
 
 
@@ -104,9 +108,19 @@ if len(projects) > 0:
     # Check command line argument
     parser = argparse.ArgumentParser(description='Easily deploy projects')
     parser.add_argument('--project', default='ask_for_it')
+    parser.add_argument('-a', '--all', action='store_true')
     args = parser.parse_args()
 
-    if args.project == 'ask_for_it':
+    if args.all:
+        # Deploy all projects!
+        for i, project in enumerate(projects):
+            project_name = os.path.basename(os.path.normpath(project))
+            target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
+
+            print(CBOLD+LGREEN, "\nDeploying project {} ({})".format(project_name, target_branch), CRESET)
+            release(project)
+
+    elif args.project == 'ask_for_it':
         print("Please select a project to sync")
         for i, project in enumerate(projects):
             project_name = os.path.basename(os.path.normpath(project))
