@@ -84,11 +84,12 @@ or even use `--all` (or `-a`) to deploy all projects:
 
 ### Symfony 2 and 3
 
-| Pass name & order  | Enabled by default | Description                                                       |
-| ------------------ | ------------------ | ----------------------------------------------------------------- |
-| composer           | ✓                  | Runs `composer install`                                           |
-| assets             | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
-| cache              | ✓                  | Clears the cache                                                  |
+| Pass name & order       | Enabled by default | Description                                                       |
+| ----------------------- | ------------------ | ----------------------------------------------------------------- |
+| composer                | ✓                  | Runs `composer install`                                           |
+| assets                  | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
+| cache                   | ✓                  | Clears the cache                                                  |
+| liip_imagine_cache_pass |                    | Clears Liip's Imagine Bundle cache                                |
 
 You have to properly setup permissions in order to avoid errors. You could use the ACLs (a more advanced way to manage permissions than POSIX file modes):
 
@@ -100,6 +101,16 @@ You have to properly setup permissions in order to avoid errors. You could use t
 In Symfony 3, replace `app/cache` with `var/cache` and `app/logs` with `var/logs`.
 
 This will give write rights to your HTTP server on the Symfony log and cache files, while your own permissions are left intact.
+
+When using liip_imagine_cache_pass, you should also setup proper permissions: yourself & HTTPD user should be able to write
+to Liip's Imagine Bundle cache directory:
+
+    cd /path/to/project
+    HTTPDUSER=`ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
+    sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media/cache
+    sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media/cache
+    sudo setfacl -R -m u:"$USER":rwX -m u:`whoami`:rwX web/media/cache
+    sudo setfacl -dR -m u:"$USER":rwX -m u:`whoami`:rwX web/media/cache
 
 ### Other plugins
 Here are the other available plugins shipped with this script:

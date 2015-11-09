@@ -7,7 +7,7 @@ def register_variants():
 
 class Symfony:
     def register_passes(self):
-        return ['composer', 'assets', 'cache']
+        return ['composer', 'assets', 'cache', '?liip_imagine_cache_pass']
 
     def composer_pass(self):
         if os.path.isfile("composer.phar"):
@@ -23,6 +23,9 @@ class Symfony:
 
     def cache_pass(self):
         stdio.ppexec(self.app_console + " cache:clear")
+
+    def liip_imagine_cache_pass(self):
+        stdio.ppexec(self.app_console + " liip:imagine:cache:remove")
 
 
 class Symfony2(Symfony):
