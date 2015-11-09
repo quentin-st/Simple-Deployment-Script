@@ -84,12 +84,12 @@ or even use `--all` (or `-a`) to deploy all projects:
 
 ### Symfony 2 and 3
 
-| Pass name & order       | Enabled by default | Description                                                       |
-| ----------------------- | ------------------ | ----------------------------------------------------------------- |
-| composer                | ✓                  | Runs `composer install`                                           |
-| assets                  | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
-| cache                   | ✓                  | Clears the cache                                                  |
-| liip_imagine_cache_pass |                    | Clears Liip's Imagine Bundle cache                                |
+| Pass name & order  | Enabled by default | Description                                                       |
+| ------------------ | ------------------ | ----------------------------------------------------------------- |
+| composer           | ✓                  | Runs `composer install`                                           |
+| assets             | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
+| cache              | ✓                  | Clears the cache                                                  |
+| liip_imagine_cache |                    | Clears Liip's Imagine Bundle cache                                |
 
 You have to properly setup permissions in order to avoid errors. You could use the ACLs (a more advanced way to manage permissions than POSIX file modes):
 
