@@ -87,6 +87,7 @@ or even use `--all` (or `-a`) to deploy all projects:
 | Pass name & order  | Enabled by default | Description                                                       |
 | ------------------ | ------------------ | ----------------------------------------------------------------- |
 | composer           | ✓                  | Runs `composer install`                                           |
+| scss               |                    | Compiles SCSS files inside project                                |
 | assets             | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
 | cache              | ✓                  | Clears the cache                                                  |
 | liip_imagine_cache |                    | Clears Liip's Imagine Bundle cache                                |

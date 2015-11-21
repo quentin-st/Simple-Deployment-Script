@@ -7,7 +7,7 @@ def register_variants():
 
 class Symfony:
     def register_passes(self):
-        return ['composer', 'assets', 'cache', '?liip_imagine_cache']
+        return ['composer', '?scss', 'assets', 'cache', '?liip_imagine_cache']
 
     def composer_pass(self):
         if os.path.isfile("composer.phar"):
@@ -27,6 +27,12 @@ class Symfony:
     def liip_imagine_cache_pass(self):
         stdio.ppexec(self.app_console + " liip:imagine:cache:remove")
 
+    def scss_pass(self):
+        # Let's find SCSS files inside this project
+        for root, dirs, files in os.walk(os.getcwd()):
+            for file in files:
+                if file.endswith(".scss") and not file.startswith("_"): # Exclude SCSS part files (_part.scss)
+                    stdio.ppexec("sass " + file + " " + file.replace(".scss", ".css") + " -style compressed")
 
 class Symfony2(Symfony):
     key_name = "symfony2"
