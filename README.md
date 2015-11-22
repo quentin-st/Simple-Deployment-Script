@@ -79,6 +79,10 @@ or even use `--all` (or `-a`) to deploy all projects:
 
     ./deploy.py --all
 
+If your project isn't listed when running `./deploy.py` (if it is outside ROOT_DIR for example), you can deploy it anyway
+by specifying its path:
+
+    ./deploy.py --project /home/john/website/
 
 ## Environment-specific recommendations & plugins
 

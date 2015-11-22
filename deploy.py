@@ -5,7 +5,6 @@ import os
 import sys
 import inspect
 import json
-from utils import stdio
 from utils.stdio import CRESET, CBOLD, LGREEN
 import plugins
 from plugins import *
@@ -40,7 +39,7 @@ def get_supported_project_types():
 
 def release(project_path):
     # Parse conf
-    conf = parse_conf(project_path + "/" + CONFIG_FILE_NAME)
+    conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
 
     # Read conf
     project_type = read_conf(conf, "projectType", "vanilla")
@@ -103,54 +102,61 @@ for dir_name in os.listdir(ROOT_DIR):
             projects.append(dir_path)
 
 
-# Ask user for project to sync
-if len(projects) > 0:
-    # Check command line argument
-    parser = argparse.ArgumentParser(description='Easily deploy projects')
-    parser.add_argument('--project', default='ask_for_it')
-    parser.add_argument('-a', '--all', action='store_true')
-    args = parser.parse_args()
+# Check command line argument
+parser = argparse.ArgumentParser(description='Easily deploy projects')
+parser.add_argument('--project', default='ask_for_it')
+parser.add_argument('-a', '--all', action='store_true')
+args = parser.parse_args()
 
-    if args.all:
-        # Deploy all projects!
+if args.all:
+    # Deploy all projects!
+    if len(projects) > 0:
         for i, project in enumerate(projects):
             project_name = os.path.basename(os.path.normpath(project))
             target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
 
             print(CBOLD+LGREEN, "\nDeploying project {} ({})".format(project_name, target_branch), CRESET)
             release(project)
-
-    elif args.project == 'ask_for_it':
-        print("Please select a project to sync")
-        for i, project in enumerate(projects):
-            project_name = os.path.basename(os.path.normpath(project))
-            target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
-
-            print("\t[{}] {} ({})".format(str(i), project_name, target_branch))
-
-        project_index = -1
-        is_valid = 0
-        while not is_valid:
-            try:
-                project_index = int(input("? "))
-                is_valid = 1
-            except ValueError:
-                print("Not a valid integer.")
-
-        if 0 <= project_index < len(projects):
-            # Here goes the thing
-            project = projects[project_index]
-
-            release(project)
-        else:
-            print("I won't take that as an answer")
     else:
-        # Deploy project passed as argument
-        project_path = ROOT_DIR + args.project
+        print("There is no suitable project in {}".format(ROOT_DIR))
 
-        if project_path in projects:
-            release(project_path)
-        else:
-            print("Project not found")
+elif args.project == 'ask_for_it':
+    print("Please select a project to sync")
+    for i, project in enumerate(projects):
+        project_name = os.path.basename(os.path.normpath(project))
+        target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
+
+        print("\t[{}] {} ({})".format(str(i), project_name, target_branch))
+
+    project_index = -1
+    is_valid = 0
+    while not is_valid:
+        try:
+            project_index = int(input("? "))
+            is_valid = 1
+        except ValueError:
+            print("Not a valid integer.")
+
+    if 0 <= project_index < len(projects):
+        # Here goes the thing
+        project = projects[project_index]
+
+        release(project)
+    else:
+        print("I won't take that as an answer")
 else:
-    print("No suitable project found in " + ROOT_DIR)
+    # Deploy project passed as argument
+    if args.project.startswith('/'):
+        project_path = args.project
+
+        if not os.path.isdir(project_path):
+            print("\"{}\" is not a directory".format(project_path))
+            sys.exit(1)
+    else:
+        project_path = os.path.join(ROOT_DIR, args.project)
+
+        if project_path not in projects:
+            print("Project not found")
+            sys.exit(1)
+
+    release(project_path)
