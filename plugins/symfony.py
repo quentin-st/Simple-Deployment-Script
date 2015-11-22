@@ -32,7 +32,7 @@ class Symfony:
         for root, dirs, files in os.walk(os.getcwd()):
             for file in files:
                 if file.endswith(".scss") and not file.startswith("_"): # Exclude SCSS part files (_part.scss)
-                    abs_path = os.path.join(root, os.path.abspath(file))
+                    abs_path = os.path.join(root, file)
                     stdio.ppexec("sass " + abs_path + " " + abs_path.replace(".scss", ".css") + " --style compressed")
 
 class Symfony2(Symfony):
