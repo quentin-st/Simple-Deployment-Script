@@ -107,7 +107,8 @@ In Symfony 3, replace `app/cache` with `var/cache` and `app/logs` with `var/logs
 
 This will give write rights to your HTTP server on the Symfony log and cache files, while your own permissions are left intact.
 
-When using liip_imagine_cache_pass, you should also setup proper permissions: yourself & HTTPD user should be able to write
+#### liip_imagine_cache pass
+When using liip_imagine_cache pass, you should also setup proper permissions: yourself & HTTPD user should be able to write
 to Liip's Imagine Bundle cache directory:
 
     cd /path/to/project
@@ -116,6 +117,14 @@ to Liip's Imagine Bundle cache directory:
     sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media/cache
     sudo setfacl -R -m u:"$USER":rwX -m u:`whoami`:rwX web/media/cache
     sudo setfacl -dR -m u:"$USER":rwX -m u:`whoami`:rwX web/media/cache
+
+#### scss pass
+This pass browses your project to find `.scss` files. Please note that it won't compile SASS part files (`_part.scss`).
+This pass uses the `sass` command to compile files. You can install it by following these steps:
+
+    sudo apt-get install rubygems
+    sudo gem install sass
+    sass -v
 
 ### Other plugins
 Here are the other available plugins shipped with this script:
