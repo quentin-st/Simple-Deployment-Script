@@ -42,7 +42,7 @@ def release(project_path):
     conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
 
     # Read conf
-    project_type = read_conf(conf, "projectType", "vanilla")
+    project_type = read_conf(conf, "projectType", "generic")
     branch = read_conf(conf, "branch", "release")
     forced_passes = read_conf(conf, "passes", "").split()
 
