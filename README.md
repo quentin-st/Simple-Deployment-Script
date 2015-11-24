@@ -58,7 +58,7 @@ To use the project, clone this repository anywhere, copy the sample configuratio
 ## How to execute it
 All you have to do is to run `./deploy.py`:
 
-    root@server:~/simple-deployment-script# ./deploy.py
+    root@server:~/Simple-Deployment-Script# ./deploy.py
     Please select a project to sync
 
         [0] project1 (master)
