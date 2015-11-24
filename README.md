@@ -15,28 +15,27 @@ Each project should contain the following file in its root directory:
 
 To use the project, clone this repository anywhere, copy the sample configuration file in each of your projects an edit it:
 
-    cp ~/simple-deployment-script/sample-deploy.conf.json /var/www/project/deploy.conf.json
-    vim /path/to/project/deploy.conf.json
+    cp ~/Simple-Deployment-Script/sample-deploy.conf.json /var/www/project/deploy.conf.json
+    vim /var/www/project/deploy.conf.json
 
 *Here are the configuration keys (all keys are optional):*
 
 
  - `projectType`
 
-    Specifies the project type. Depending on its value, different hooks will be
-    executed after the local repository has been synced.
+    Specifies the project type. Depending on its value, different passes will be executed after the local repository has been synced.
 
-    **Type**: `string`
-    **Values**: (`"symfony2"`)
-    **Default value**: `"vanilla"`
+    **Type**: `string`  
+    **Values**: `symfony2` / `mkdocs` / `generic`  
+    **Default value**: `generic`
 
 
  - `branch`
 
     Specifies the production branch
 
-    **Type**: `string`
-    **Default value**: `"release"`
+    **Type**: `string`  
+    **Default value**: `release`
 
  - `passes`
 
@@ -47,14 +46,14 @@ To use the project, clone this repository anywhere, copy the sample configuratio
     If you want to execute that type of pass, you have to specify that here. You can also force-disable a pass that the
     plugin executes by default by putting a minus symbol (**-**) just before the pass name.
 
-    The syntax of this value is dead simple, write the passes you want to disable or enable, separate them by a space.
+    The syntax of this value is dead simple: write the passes you want to disable or enable, separated by a space.
 
     **Example:** `"passes": "-pass_a +pass_b"` This will force-disable _pass_a_ and force-enable _pass_b_.
 
     If you specify a pass that doesn't exists, it is ignored.
 
-    **Type**: `string`
-    **Default value**: `""`
+    **Type**: `string`  
+    **Default value**: `` *(empty string)*
 
 ## How to execute it
 All you have to do is to run `./deploy.py`:
