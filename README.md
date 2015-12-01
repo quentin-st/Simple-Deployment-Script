@@ -83,6 +83,13 @@ by specifying its path:
 
     ./deploy.py --project /home/john/website/
 
+## About plugins output encoding
+Depending on your server's encoding, you may have to explicit `PYTHONIOENCODING` environment variable to force it to UTF-8:
+
+    export PYTHONIOENCODING=utf_8
+
+Check [here](http://unix.stackexchange.com/a/117470) to read more about making this setting persistent.
+
 ## Environment-specific recommendations & plugins
 
 ### Symfony 2 and 3
