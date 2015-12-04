@@ -26,7 +26,7 @@ To use the project, clone this repository anywhere, copy the sample configuratio
     Specifies the project type. Depending on its value, different passes will be executed after the local repository has been synced.
 
     **Type**: `string`  
-    **Values**: `symfony2` / `mkdocs` / `generic`  
+    **Values**: `symfony2` / `symfony3` / `mkdocs` / `generic`  
     **Default value**: `generic`
 
 
