@@ -17,5 +17,5 @@ def ppexec(cmd):
         if line == empty_line:
             continue
 
-        print(CDIM + "   " + line.decode(sys.stdout.encoding) + CRESET)
+        print(CDIM + "    " + line.decode(sys.stdout.encoding) + CRESET)
 
