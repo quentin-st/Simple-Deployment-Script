@@ -55,6 +55,16 @@ To use the project, clone this repository anywhere, copy the sample configuratio
     **Type**: `string`  
     **Default value**: `` *(empty string)*
 
+ - `commands`
+    
+    You can run custom commands that are either not handled by this scripts, or project-specific. Your deploy.conf.json
+    file must contain all commands in the `commands` array:
+    
+        "commands": [
+            "ls -l",
+            "git status"
+        ]
+
 ## How to execute it
 All you have to do is to run `./deploy.py`:
 

@@ -5,6 +5,7 @@ import os
 import sys
 import inspect
 import json
+from utils import stdio
 from utils.stdio import CRESET, CBOLD, LGREEN
 import plugins
 from plugins import *
@@ -81,6 +82,14 @@ def release(project_path):
     for i, pass_name in enumerate(deploy_passes):
         print(CBOLD, "\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CRESET)
         getattr(plugin, pass_name + "_pass")()
+
+    # Execute custom commands
+    commands = read_conf(conf, "commands", [])
+    if len(commands) > 0:
+        print(CBOLD + LGREEN, "\nExecuting custom commands", CRESET)
+
+        for command in commands:
+            stdio.ppexec(command)
 
     # The End
     print(CBOLD+LGREEN, "\n==> {} successfully deployed. Have an A1 day!\n".format(project_path), CRESET)

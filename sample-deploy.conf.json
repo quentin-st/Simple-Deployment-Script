@@ -1,4 +1,9 @@
 {
     "projectType":  "symfony2",
-    "branch" :      "release"
+    "branch":       "release",
+    "passes":       "+scss",
+    "commands": [
+        "ls -l",
+        "git status"
+    ]
 }
