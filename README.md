@@ -121,8 +121,6 @@ to Liip's Imagine Bundle cache directory:
     HTTPDUSER=`ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
     sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media/cache
     sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media/cache
-    sudo setfacl -R -m u:"$USER":rwX -m u:`whoami`:rwX web/media/cache
-    sudo setfacl -dR -m u:"$USER":rwX -m u:`whoami`:rwX web/media/cache
 
 #### scss pass
 This pass browses your project to find `.scss` files. Please note that it won't compile SASS part files (`_part.scss`).
