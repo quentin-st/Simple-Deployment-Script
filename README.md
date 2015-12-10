@@ -93,6 +93,17 @@ by specifying its path:
 
     ./deploy.py --project /home/john/website/
 
+### Alias
+You can create an alias to easily execute this command from anywhere:
+
+    # ~/.bashrc
+    # ...
+
+    alias deploy='/root/Simple-Deployment-Script/deploy.py'
+
+Execute `source ~/.bashrc` to take changes into account in your current session. You'll then be able to execute
+`deploy --project my_project` from any directory.
+
 ## About plugins output encoding
 Depending on your server's encoding, you may have to explicit `PYTHONIOENCODING` environment variable to force it to UTF-8:
 
