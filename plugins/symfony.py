@@ -8,7 +8,7 @@ def register_variants():
 
 class Symfony:
     def register_passes(self):
-        return ['composer', '?scss', 'assets', 'cache', '?liip_imagine_cache']
+        return ['composer', '?scss', 'assets', 'cache', '?liip_imagine_cache', '?update_database_schema']
 
     def composer_pass(self):
         if os.path.isfile("composer.phar"):
@@ -35,6 +35,10 @@ class Symfony:
                 if file.endswith(".scss") and not file.startswith("_"): # Exclude SCSS part files (_part.scss)
                     abs_path = os.path.join(root, file)
                     stdio.ppexec("sass " + abs_path + " " + abs_path.replace(".scss", ".css") + " --style compressed")
+
+    def update_database_schema_pass(self):
+        stdio.ppexec(self.app_console + " doctrine:schema:update --force")
+
 
 class Symfony2(Symfony):
     key_name = "symfony2"
