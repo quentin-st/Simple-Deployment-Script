@@ -12,15 +12,7 @@ import plugins
 from plugins import *
 from config import ROOT_DIR, CONFIG_FILE_NAME
 
-# Here goes the functions
-
-
-def read_conf(array, key, default_value):
-    """Returns the value for a conf key. If not found, returns the default_value"""
-    if key in array:
-        return array[key]
-    else:
-        return default_value
+# Here go the functions
 
 
 def parse_conf(file_path):
@@ -44,9 +36,8 @@ def release(project_path):
     conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
 
     # Read conf
-    project_type = read_conf(conf, "projectType", "generic")
-    branch = read_conf(conf, "branch", "release")
-    forced_passes = read_conf(conf, "passes", "").split()
+    project_type = conf.get("projectType", "generic")
+    branch = conf.get("branch", "release")
 
     # Check the project type
     types = get_supported_project_types()
@@ -59,7 +50,11 @@ def release(project_path):
     os.system("git checkout " + branch)
     os.system("git pull")
 
+    # get an updated version of the conf, if the config file has changed after the pull
+    conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
+
     # Determine plugin-specific passes
+    forced_passes = conf.get("passes", "").split()
     plugin = types[project_type]()
 
     deploy_passes = []
@@ -85,7 +80,7 @@ def release(project_path):
         getattr(plugin, pass_name + "_pass")()
 
     # Execute custom commands
-    commands = read_conf(conf, "commands", [])
+    commands = conf.get("commands", [])
     if len(commands) > 0:
         print(CBOLD + LGREEN, "\nExecuting custom commands", CRESET)
 
@@ -122,7 +117,7 @@ if args.all:
     if len(projects) > 0:
         for i, project in enumerate(projects):
             project_name = os.path.basename(os.path.normpath(project))
-            target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
+            target_branch = parse_conf(os.path.join(project, CONFIG_FILE_NAME)).get("branch", "release")
 
             print(CBOLD+LGREEN, "\nDeploying project {} ({})".format(project_name, target_branch), CRESET)
             release(project)
@@ -133,7 +128,7 @@ elif args.project == 'ask_for_it':
     print("Please select a project to sync")
     for i, project in enumerate(projects):
         project_name = os.path.basename(os.path.normpath(project))
-        target_branch = read_conf(parse_conf("{}/{}".format(project, CONFIG_FILE_NAME)), "branch", "release")
+        target_branch = parse_conf(os.path.join(project, CONFIG_FILE_NAME)).get("branch", "release")
 
         print("\t[{}] {} ({})".format(str(i), project_name, target_branch))
 
