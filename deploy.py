@@ -5,6 +5,7 @@ import os
 import sys
 import inspect
 import json
+
 from utils import stdio
 from utils.stdio import CRESET, CBOLD, LGREEN
 import plugins
@@ -95,15 +96,14 @@ def release(project_path):
     print(CBOLD+LGREEN, "\n==> {} successfully deployed. Have an A1 day!\n".format(project_path), CRESET)
 
 
-
 # Here goes the code
-
+sanitized_root_dir = os.path.expanduser(ROOT_DIR.strip('/'))
 projects = []
 # Get all projects for ROOT_DIR
-for dir_name in os.listdir(ROOT_DIR):
-    if os.path.isdir(ROOT_DIR + dir_name):
-        dir_path = ROOT_DIR + dir_name
-        config_file_path = dir_path + "/" + CONFIG_FILE_NAME
+for dir_name in os.listdir(sanitized_root_dir):
+    dir_path = os.path.join(sanitized_root_dir, dir_name)
+    if os.path.isdir(dir_path):
+        config_file_path = os.path.join(dir_path, CONFIG_FILE_NAME)
 
         # Look for config file for this project
         if os.path.exists(config_file_path) and os.path.isfile(config_file_path):
@@ -127,7 +127,7 @@ if args.all:
             print(CBOLD+LGREEN, "\nDeploying project {} ({})".format(project_name, target_branch), CRESET)
             release(project)
     else:
-        print("There is no suitable project in {}".format(ROOT_DIR))
+        print("There is no suitable project in {}".format(sanitized_root_dir))
 
 elif args.project == 'ask_for_it':
     print("Please select a project to sync")
@@ -162,7 +162,7 @@ else:
             print("\"{}\" is not a directory".format(project_path))
             sys.exit(1)
     else:
-        project_path = os.path.join(ROOT_DIR, args.project)
+        project_path = os.path.join(sanitized_root_dir, args.project)
 
         if project_path not in projects:
             print("Project not found")
