@@ -92,7 +92,7 @@ def release(project_path):
 
 
 # Here goes the code
-sanitized_root_dir = os.path.expanduser(ROOT_DIR.strip('/'))
+sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
 projects = []
 # Get all projects for ROOT_DIR
 for dir_name in os.listdir(sanitized_root_dir):
