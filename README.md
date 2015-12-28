@@ -119,7 +119,8 @@ Check [here](http://unix.stackexchange.com/a/117470) to read more about making t
 | ------------------ | ------------------ | ----------------------------------------------------------------- |
 | composer           | ✓                  | Runs `composer install`                                           |
 | scss               |                    | Compiles SCSS files inside project                                |
-| assets             | ✓                  | Dumps the Symfony Bundle Assets & run Assetic's dump command too  |
+| assets             | ✓                  | Dumps bundles assets to web directory (`asset:install`)           |
+| assetic            | ✓                  | Runs `assetic:dump` command                                       |
 | cache              | ✓                  | Clears the cache                                                  |
 | liip_imagine_cache |                    | Clears Liip's Imagine Bundle cache                                |
 

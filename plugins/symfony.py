@@ -8,7 +8,7 @@ def register_variants():
 
 class Symfony:
     def register_passes(self):
-        return ['composer', '?scss', 'assets', 'cache', '?liip_imagine_cache', '?update_database_schema']
+        return ['composer', '?scss', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
 
     def composer_pass(self):
         if os.path.isfile("composer.phar"):
@@ -20,6 +20,8 @@ class Symfony:
 
     def assets_pass(self):
         stdio.ppexec(self.app_console + " assets:install")
+
+    def assetic_pass(self):
         stdio.ppexec(self.app_console + " assetic:dump")
 
     def cache_pass(self):
