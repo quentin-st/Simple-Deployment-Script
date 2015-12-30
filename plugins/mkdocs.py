@@ -1,14 +1,16 @@
 from utils import stdio
+from plugins import generic
 
 def register_variants():
     return [MkDocs]
 
 
-class MkDocs:
+class MkDocs(generic.Generic):
     key_name = "mkdocs"
 
     def register_passes(self):
-        return ['build', '?checkout_dash_dash_site']
+        generic_passes = generic.Generic.register_passes(self)
+        return generic_passes + ['build', '?checkout_dash_dash_site']
 
     def build_pass(self):
         stdio.ppexec("mkdocs build --clean")

@@ -1,14 +1,16 @@
 import os
 from utils import stdio
+from plugins import generic
 
 
 def register_variants():
     return [Symfony2, Symfony3]
 
 
-class Symfony:
+class Symfony(generic.Generic):
     def register_passes(self):
-        return ['composer', '?scss', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
+        generic_passes = generic.Generic.register_passes(self)
+        return generic_passes + ['composer', '?scss', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
 
     def composer_pass(self):
         if os.path.isfile("composer.phar"):
