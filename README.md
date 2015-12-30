@@ -45,6 +45,9 @@ To use the project, clone this repository anywhere, copy the sample configuratio
     the deployment. A plugin can mark a pass to not be executed by default (please refer to the plugin's documentation).
     If you want to execute that type of pass, you have to specify that here. You can also force-disable a pass that the
     plugin executes by default by putting a minus symbol (**-**) just before the pass name.
+    
+    Some passes are plugin-specific (the *composer* pass in the **symfony** plugin for example), but passes that are
+    defined in the **generic** plugin are usable everywhere.
 
     The syntax of this value is dead simple: write the passes you want to disable or enable, separated by a space.
 
@@ -111,19 +114,34 @@ Depending on your server's encoding, you may have to explicit `PYTHONIOENCODING`
 
 Check [here](http://unix.stackexchange.com/a/117470) to read more about making this setting persistent.
 
-## Environment-specific recommendations & plugins
+## Plugins
+
+### Generic
+All passes defined in this plugin are disabled by default and can be used in all other plugins that extends it.
+
+| Pass name & order  | Enabled by default | Description                                                       |
+| ------------------ | ------------------ | ----------------------------------------------------------------- |
+| scss               |                    | Compiles SCSS files inside project                                |
+
+#### scss pass
+This pass browses your project to find `.scss` files. Please note that it won't compile SASS part files (`_part.scss`).
+This pass uses the `sass` command to compile files. You can install it by following these steps:
+
+    sudo apt-get install rubygems
+    sudo gem install sass
+    sass -v
 
 ### Symfony 2 and 3
 
 | Pass name & order  | Enabled by default | Description                                                       |
 | ------------------ | ------------------ | ----------------------------------------------------------------- |
 | composer           | ✓                  | Runs `composer install`                                           |
-| scss               |                    | Compiles SCSS files inside project                                |
 | assets             | ✓                  | Dumps bundles assets to web directory (`asset:install`)           |
 | assetic            | ✓                  | Runs `assetic:dump` command                                       |
 | cache              | ✓                  | Clears the cache                                                  |
 | liip_imagine_cache |                    | Clears Liip's Imagine Bundle cache                                |
 
+#### Permissions
 You have to properly setup permissions in order to avoid errors. You could use the ACLs (a more advanced way to manage permissions than POSIX file modes):
 
     cd /path/to/project
@@ -144,16 +162,7 @@ to Liip's Imagine Bundle cache directory:
     sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media
     sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media
 
-#### scss pass
-This pass browses your project to find `.scss` files. Please note that it won't compile SASS part files (`_part.scss`).
-This pass uses the `sass` command to compile files. You can install it by following these steps:
-
-    sudo apt-get install rubygems
-    sudo gem install sass
-    sass -v
-
 ### Other plugins
 Here are the other available plugins shipped with this script:
 
 - Mkdocs, see [Mkdocs website](http://www.mkdocs.org/) to learn more about this tool
-- Generic: passes-less plugin. Use this if you don't have anything to process after having pulled.

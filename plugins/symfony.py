@@ -10,7 +10,7 @@ def register_variants():
 class Symfony(generic.Generic):
     def register_passes(self):
         generic_passes = generic.Generic.register_passes(self)
-        return generic_passes + ['composer', '?scss', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
+        return generic_passes + ['composer', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
 
     def composer_pass(self):
         if os.path.isfile("composer.phar"):
@@ -31,14 +31,6 @@ class Symfony(generic.Generic):
 
     def liip_imagine_cache_pass(self):
         stdio.ppexec(self.app_console + " liip:imagine:cache:remove")
-
-    def scss_pass(self):
-        # Let's find SCSS files inside this project
-        for root, dirs, files in os.walk(os.getcwd()):
-            for file in files:
-                if file.endswith(".scss") and not file.startswith("_"): # Exclude SCSS part files (_part.scss)
-                    abs_path = os.path.join(root, file)
-                    stdio.ppexec("sass " + abs_path + " " + abs_path.replace(".scss", ".css") + " --style compressed")
 
     def update_database_schema_pass(self):
         stdio.ppexec(self.app_console + " doctrine:schema:update --force")
