@@ -166,3 +166,4 @@ to Liip's Imagine Bundle cache directory:
 Here are the other available plugins shipped with this script:
 
 - Mkdocs, see [Mkdocs website](http://www.mkdocs.org/) to learn more about this tool
+- Jekyll, see [Jekyll website](https://jekyllrb.com)
