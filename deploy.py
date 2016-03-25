@@ -94,17 +94,16 @@ def release(project_path):
 # Here goes the code
 sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
 projects = []
-# Get all projects for ROOT_DIR
-for dir_name in os.listdir(sanitized_root_dir):
-    dir_path = os.path.join(sanitized_root_dir, dir_name)
-    if os.path.isdir(dir_path):
-        config_file_path = os.path.join(dir_path, CONFIG_FILE_NAME)
 
-        # Look for config file for this project
-        if os.path.exists(config_file_path) and os.path.isfile(config_file_path):
-            # Here we should try to parse it just in case, but hey
-            projects.append(dir_path)
-
+# Recursively find config file in ROOT_DIR
+print("Scanning {} for {} files".format(ROOT_DIR, CONFIG_FILE_NAME))
+for root, dirs, files in os.walk(sanitized_root_dir):
+    for file in files:
+        if file == CONFIG_FILE_NAME:
+            file_path = os.path.join(root, file)
+            print("Found ~/{}".format(os.path.relpath(file_path, ROOT_DIR)))
+            projects.append(root)
+print()
 
 # Check command line argument
 parser = argparse.ArgumentParser(description='Easily deploy projects')
@@ -128,6 +127,11 @@ elif args.project == 'ask_for_it':
     print("Please select a project to sync")
     for i, project in enumerate(projects):
         project_name = os.path.basename(os.path.normpath(project))
+
+        # If project isn't located in ROOT_DIR, display the full relative path
+        if os.path.dirname(project) != ROOT_DIR:
+            project_name = os.path.relpath(project, ROOT_DIR)
+
         target_branch = parse_conf(os.path.join(project, CONFIG_FILE_NAME)).get("branch", "release")
 
         print("\t[{}] {} ({})".format(str(i), project_name, target_branch))
