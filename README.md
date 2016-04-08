@@ -54,6 +54,8 @@ To use the project, clone this repository anywhere, copy the sample configuratio
     **Example:** `"passes": "-pass_a +pass_b"` This will force-disable _pass_a_ and force-enable _pass_b_.
 
     If you specify a pass that doesn't exists, it is ignored.
+    
+    You can also disable *git_checkout* (`git checkout {branch}` command) and/or *git_pull* (`git pull` command) special passes.
 
     **Type**: `string`  
     **Default value**: `` *(empty string)*

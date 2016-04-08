@@ -92,6 +92,7 @@ def release(project):
     # Read conf
     project_type = conf.get("projectType", "generic")
     branch = conf.get("branch", "release")
+    forced_passes = conf.get("passes", "").split()
 
     print(CBOLD + LGREEN, "\nDeploying project {} ({})".format(project_name, branch), CRESET)
 
@@ -103,14 +104,19 @@ def release(project):
 
     # Let's go!
     os.chdir(project_path)
-    os.system("git checkout " + branch)
-    os.system("git pull")
 
-    # Get an updated version of the conf, if the config file has changed after the pull
-    conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
+    # Check if either git_checkout or git_pull special passes are disabled
+    if "-git_checkout" not in forced_passes:
+        os.system("git checkout " + branch)
+
+    if "-git_pull" not in forced_passes:
+        os.system("git pull")
+
+        # Get an updated version of the conf, if the config file has changed after the pull
+        conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
+        forced_passes = conf.get("passes", "").split()
 
     # Determine plugin-specific passes
-    forced_passes = conf.get("passes", "").split()
     plugin = types[project_type]()
 
     deploy_passes = []
