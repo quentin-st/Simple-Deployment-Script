@@ -167,3 +167,6 @@ Here are the other available plugins shipped with this script:
 
 - Mkdocs, see [Mkdocs website](http://www.mkdocs.org/) to learn more about this tool
 - Jekyll, see [Jekyll website](https://jekyllrb.com)
+
+## Update
+You can run `deploy --self-update` to make sure you run the latest version of this script.
