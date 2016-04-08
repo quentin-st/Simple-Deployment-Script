@@ -110,13 +110,14 @@ def release(project):
 
         deploy_passes.append(pass_name)
 
-    print(CBOLD+LGREEN, "\n==> Deployment starting with passes: {}".format(", ".join(deploy_passes)), CRESET)
+    if len(deploy_passes) > 0:
+        print(CBOLD+LGREEN, "\n==> Deployment starting with passes: {}".format(", ".join(deploy_passes)), CRESET)
 
-    # Start env-specific passes
-    npasses = len(deploy_passes)
-    for i, pass_name in enumerate(deploy_passes):
-        print(CBOLD, "\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CRESET)
-        getattr(plugin, pass_name + "_pass")()
+        # Start env-specific passes
+        npasses = len(deploy_passes)
+        for i, pass_name in enumerate(deploy_passes):
+            print(CBOLD, "\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CRESET)
+            getattr(plugin, pass_name + "_pass")()
 
     # Execute custom commands
     commands = conf.get("commands", [])
