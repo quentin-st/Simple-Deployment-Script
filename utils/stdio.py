@@ -13,11 +13,13 @@ def ppexec(cmd):
     print("    [$ {}]".format(cmd))
     empty_line = bytes()
 
-    p = Popen(cmd, stdout = PIPE, stderr = STDOUT, shell = True)
+    p = Popen(cmd, stdout=PIPE, stderr=STDOUT, shell=True)
     for line in p.stdout:
         line = line.strip()
         if line == empty_line:
             continue
 
-        print(CDIM + "    " + line.decode(sys.stdout.encoding) + CRESET)
-
+        try:
+            print(CDIM + "    " + line.decode(sys.stdout.encoding) + CRESET)
+        except UnicodeDecodeError:
+            print(CDIM + "    " + line.decode('windows-1252') + CRESET)
