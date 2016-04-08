@@ -7,7 +7,7 @@ import inspect
 import json
 
 from utils import stdio
-from utils.stdio import CRESET, CBOLD, LGREEN
+from utils.stdio import CRESET, CDIM, CBOLD, LGREEN, LWARN, LRED
 import plugins
 # The following line is necessary in order for project types to be found
 from plugins import *
@@ -21,13 +21,19 @@ def find_projects():
     projects = []
 
     # Recursively find config file in ROOT_DIR
-    print("Scanning {} for {} files".format(sanitized_root_dir, CONFIG_FILE_NAME))
+    print(CDIM, "Scanning {} for {} files".format(sanitized_root_dir, CONFIG_FILE_NAME), CRESET)
     for root, dirs, files in os.walk(sanitized_root_dir):
         for file in files:
             if file == CONFIG_FILE_NAME:
                 file_path = os.path.join(root, file)
-                print("Found ~/{}".format(os.path.relpath(file_path, sanitized_root_dir)))
-                projects.append(load_project(root))
+                project = load_project(root)
+                malformed_conf = True if project['conf'] is None else False
+
+                print(CDIM+LWARN if malformed_conf else CDIM, "\tFound ~/{} {}".format(
+                    os.path.relpath(file_path, sanitized_root_dir),
+                    ' (malformed)' if malformed_conf else ''
+                ), CRESET)
+                projects.append(project)
 
     print()
 
@@ -42,12 +48,17 @@ def load_project(project_path):
         project_name = os.path.basename(os.path.normpath(project_path))
     conf_path = os.path.join(project_path, CONFIG_FILE_NAME)
 
-    # TODO try catch conf parsing
+    # Try to parse conf (a malformed conf file may prevent one from deploying at all)
+    try:
+        conf = parse_conf(conf_path)
+    except ValueError:
+        conf = None
 
     return {
         'name': project_name,
         'path': project_path,
-        'conf': parse_conf(conf_path)
+        'conf': conf,
+        'conf_path': conf_path
     }
 
 
@@ -72,6 +83,11 @@ def release(project):
     project_path = project['path']
     conf = project['conf']
 
+    # Conf is malformed
+    if conf is None:
+        print(CBOLD + LRED, "\nMalformed config file ({})".format(project['conf_path']), CRESET)
+        return
+
     # Read conf
     project_type = conf.get("projectType", "generic")
     branch = conf.get("branch", "release")
@@ -81,7 +97,7 @@ def release(project):
     # Check the project type
     types = get_supported_project_types()
     if project_type not in types:
-        print("Unknown project type \"{}\".".format(project_type))
+        print(CBOLD + LWARN, "Unknown project type \"{}\".".format(project_type), CRESET)
         return
 
     # Let's go!
@@ -155,9 +171,14 @@ elif args.project == 'ask_for_it':
 
     print("Please select a project to deploy")
     for i, project in enumerate(projects):
-        target_branch = project['conf'].get("branch", "release")
+        malformed_conf = True if project['conf'] is None else False
 
-        print("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
+        if malformed_conf:
+            print(CDIM+LWARN, "\t[{}] {} (malformed conf)".format(str(i), project['name']), CRESET)
+        else:
+            target_branch = project['conf'].get("branch", "release")
+
+            print("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
 
     # Read user input
     project_index = -1

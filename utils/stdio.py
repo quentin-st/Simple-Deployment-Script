@@ -5,6 +5,8 @@ CRESET = "\033[0m"
 CDIM   = "\033[2m"
 CBOLD  = "\033[1m"
 LGREEN = "\033[92m"
+LWARN  = "\033[93m"
+LRED   = "\033[91m"
 
 
 def ppexec(cmd):
