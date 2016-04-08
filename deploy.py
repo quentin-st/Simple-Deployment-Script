@@ -5,6 +5,7 @@ import os
 import sys
 import inspect
 import json
+import re
 
 from utils import stdio
 from utils.stdio import CRESET, CDIM, CBOLD, LGREEN, LWARN, LRED
@@ -184,7 +185,7 @@ elif args.all:
 elif args.project == 'ask_for_it':
     projects = find_projects()
 
-    print("Please select a project to deploy")
+    print("Please select a project to deploy (^C to exit): '1' or '1, 3, 5'")
     for i, project in enumerate(projects):
         malformed_conf = True if project['conf'] is None else False
 
@@ -192,24 +193,24 @@ elif args.project == 'ask_for_it':
             print(CDIM+LWARN, "\t[{}] {} (malformed conf)".format(str(i), project['name']), CRESET)
         else:
             target_branch = project['conf'].get("branch", "release")
-
             print("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
 
     # Read user input
-    project_index = -1
-    is_valid = 0
-    while not is_valid:
-        try:
-            project_index = int(input("? "))
-            is_valid = 1
-        except ValueError:
-            print("Not a valid integer.")
+    regex = re.compile('(-?\d+)(,\s*-?d+)?')
+    matches = []
 
-    if 0 <= project_index < len(projects):
-        # Here goes the thing
-        release(projects[project_index])
-    else:
-        print("I won't take that as an answer")
+    while len(matches) == 0:
+        matches = regex.findall(input("? "))
+
+        if len(matches) > 0:
+            for match in matches:
+                index = int(match[0])
+                if 0 <= index < len(projects):
+                    release(projects[index])
+                else:
+                    print("Invalid project index {}, ignoring".format(index))
+        else:
+            print("Not a valid sequence. Use either '1' or '1, 3, 5' instead")
 else:
     # Deploy project passed as argument
     if args.project.startswith('/'):  # Full absolute path

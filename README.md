@@ -72,8 +72,7 @@ To use the project, clone this repository anywhere, copy the sample configuratio
 All you have to do is to run `./deploy.py`:
 
     root@server:~/Simple-Deployment-Script# ./deploy.py
-    Please select a project to sync
-
+    Please select a project to deploy
         [0] project1 (master)
         [1] project2 (release)
         [2] project3 (release)
@@ -82,6 +81,8 @@ All you have to do is to run `./deploy.py`:
     Already on 'release'
     Already up-to-date.
     Release finished. Have an A1 day!
+
+> Tip: you can specify a sequence of integers such as `0, 1, 3` to deploy several projects in a row
 
 You can also specify the project you want to deploy as a command line argument:
 
