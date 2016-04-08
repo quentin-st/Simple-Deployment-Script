@@ -234,7 +234,7 @@ else:
         if len(results) == 0:
             print(CBOLD+LRED, "No project found with this name. Re-run this script without args to list all projects", CRESET)
             sys.exit(1)
-        elif len(results) > 0:
+        elif len(results) > 1:
             print(CBOLD+LWARN, "Ambiguous project name, re-run this script without args or specify absolute path", CRESET)
             sys.exit(1)
 
