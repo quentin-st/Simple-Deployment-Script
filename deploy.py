@@ -31,7 +31,7 @@ def find_projects():
 
                 print(CDIM+LWARN if malformed_conf else CDIM, "\tFound ~/{} {}".format(
                     os.path.relpath(file_path, sanitized_root_dir),
-                    ' (malformed)' if malformed_conf else ''
+                    '(malformed)' if malformed_conf else ''
                 ), CRESET)
                 projects.append(project)
 
@@ -207,8 +207,13 @@ else:
         projects = find_projects()
         project_path = os.path.join(sanitized_root_dir, args.project)
 
-        if project_path not in projects:
-            print("Project not found")
+        results = [project for project in projects if project['path'] == project_path]
+
+        if len(results) == 0:
+            print(CBOLD+LRED, "No project found with this name. Re-run this script without args to list all projects", CRESET)
+            sys.exit(1)
+        elif len(results) > 0:
+            print(CBOLD+LWARN, "Ambiguous project name, re-run this script without args or specify absolute path", CRESET)
             sys.exit(1)
 
     release(load_project(project_path))
