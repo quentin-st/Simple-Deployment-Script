@@ -9,6 +9,8 @@ import json
 from utils import stdio
 from utils.stdio import CRESET, CBOLD, LGREEN
 import plugins
+# The following line is necessary in order for project types to be found
+from plugins import *
 from config import ROOT_DIR, CONFIG_FILE_NAME
 
 # Here goes the functions
@@ -130,7 +132,6 @@ def release(project):
 
 # Here goes the code
 sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
-print()
 
 # Check command line argument
 parser = argparse.ArgumentParser(description='Easily deploy projects')
