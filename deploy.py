@@ -9,10 +9,44 @@ import json
 from utils import stdio
 from utils.stdio import CRESET, CBOLD, LGREEN
 import plugins
-from plugins import *
 from config import ROOT_DIR, CONFIG_FILE_NAME
 
-# Here go the functions
+# Here goes the functions
+
+
+def find_projects():
+    sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
+    projects = []
+
+    # Recursively find config file in ROOT_DIR
+    print("Scanning {} for {} files".format(sanitized_root_dir, CONFIG_FILE_NAME))
+    for root, dirs, files in os.walk(sanitized_root_dir):
+        for file in files:
+            if file == CONFIG_FILE_NAME:
+                file_path = os.path.join(root, file)
+                print("Found ~/{}".format(os.path.relpath(file_path, sanitized_root_dir)))
+                projects.append(load_project(root))
+
+    print()
+
+    return projects
+
+
+def load_project(project_path):
+    # If project isn't located in ROOT_DIR, set the full relative path as project_name
+    if os.path.dirname(project_path) != ROOT_DIR:
+        project_name = os.path.relpath(project_path, ROOT_DIR)
+    else:
+        project_name = os.path.basename(os.path.normpath(project_path))
+    conf_path = os.path.join(project_path, CONFIG_FILE_NAME)
+
+    # TODO try catch conf parsing
+
+    return {
+        'name': project_name,
+        'path': project_path,
+        'conf': parse_conf(conf_path)
+    }
 
 
 def parse_conf(file_path):
@@ -31,13 +65,16 @@ def get_supported_project_types():
     return plugins_list
 
 
-def release(project_path):
-    # Parse conf
-    conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
+def release(project):
+    project_name = project['name']
+    project_path = project['path']
+    conf = project['conf']
 
     # Read conf
     project_type = conf.get("projectType", "generic")
     branch = conf.get("branch", "release")
+
+    print(CBOLD + LGREEN, "\nDeploying project {} ({})".format(project_name, branch), CRESET)
 
     # Check the project type
     types = get_supported_project_types()
@@ -50,7 +87,7 @@ def release(project_path):
     os.system("git checkout " + branch)
     os.system("git pull")
 
-    # get an updated version of the conf, if the config file has changed after the pull
+    # Get an updated version of the conf, if the config file has changed after the pull
     conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
 
     # Determine plugin-specific passes
@@ -93,16 +130,6 @@ def release(project_path):
 
 # Here goes the code
 sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
-projects = []
-
-# Recursively find config file in ROOT_DIR
-print("Scanning {} for {} files".format(ROOT_DIR, CONFIG_FILE_NAME))
-for root, dirs, files in os.walk(sanitized_root_dir):
-    for file in files:
-        if file == CONFIG_FILE_NAME:
-            file_path = os.path.join(root, file)
-            print("Found ~/{}".format(os.path.relpath(file_path, ROOT_DIR)))
-            projects.append(root)
 print()
 
 # Check command line argument
@@ -112,30 +139,25 @@ parser.add_argument('-a', '--all', action='store_true')
 args = parser.parse_args()
 
 if args.all:
+    projects = find_projects()
+
     # Deploy all projects!
     if len(projects) > 0:
         for i, project in enumerate(projects):
-            project_name = os.path.basename(os.path.normpath(project))
-            target_branch = parse_conf(os.path.join(project, CONFIG_FILE_NAME)).get("branch", "release")
-
-            print(CBOLD+LGREEN, "\nDeploying project {} ({})".format(project_name, target_branch), CRESET)
             release(project)
     else:
         print("There is no suitable project in {}".format(sanitized_root_dir))
 
 elif args.project == 'ask_for_it':
-    print("Please select a project to sync")
+    projects = find_projects()
+
+    print("Please select a project to deploy")
     for i, project in enumerate(projects):
-        project_name = os.path.basename(os.path.normpath(project))
+        target_branch = project['conf'].get("branch", "release")
 
-        # If project isn't located in ROOT_DIR, display the full relative path
-        if os.path.dirname(project) != ROOT_DIR:
-            project_name = os.path.relpath(project, ROOT_DIR)
+        print("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
 
-        target_branch = parse_conf(os.path.join(project, CONFIG_FILE_NAME)).get("branch", "release")
-
-        print("\t[{}] {} ({})".format(str(i), project_name, target_branch))
-
+    # Read user input
     project_index = -1
     is_valid = 0
     while not is_valid:
@@ -147,24 +169,23 @@ elif args.project == 'ask_for_it':
 
     if 0 <= project_index < len(projects):
         # Here goes the thing
-        project = projects[project_index]
-
-        release(project)
+        release(projects[project_index])
     else:
         print("I won't take that as an answer")
 else:
     # Deploy project passed as argument
-    if args.project.startswith('/'):
+    if args.project.startswith('/'):  # Full absolute path
         project_path = args.project
 
         if not os.path.isdir(project_path):
             print("\"{}\" is not a directory".format(project_path))
             sys.exit(1)
-    else:
+    else:  # Project name
+        projects = find_projects()
         project_path = os.path.join(sanitized_root_dir, args.project)
 
         if project_path not in projects:
             print("Project not found")
             sys.exit(1)
 
-    release(project_path)
+    release(load_project(project_path))
