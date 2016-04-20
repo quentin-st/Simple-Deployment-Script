@@ -228,24 +228,16 @@ elif args.project == 'ask_for_it':
         else:
             print("Not a valid sequence. Use either '1' or '1, 3, 5' instead")
 else:
-    # Deploy project passed as argument
-    if args.project.startswith('/'):  # Full absolute path
-        project_path = args.project
+    projects = find_projects()
+    project_path = os.path.join(sanitized_root_dir, args.project)
 
-        if not os.path.isdir(project_path):
-            print("\"{}\" is not a directory".format(project_path))
-            sys.exit(1)
-    else:  # Project name
-        projects = find_projects()
-        project_path = os.path.join(sanitized_root_dir, args.project)
+    results = [project for project in projects if project['path'] == project_path]
 
-        results = [project for project in projects if project['path'] == project_path]
-
-        if len(results) == 0:
-            print(CBOLD+LRED, "No project found with this name. Re-run this script without args to list all projects", CRESET)
-            sys.exit(1)
-        elif len(results) > 1:
-            print(CBOLD+LWARN, "Ambiguous project name, re-run this script without args or specify absolute path", CRESET)
-            sys.exit(1)
+    if len(results) == 0:
+        print(CBOLD+LRED, "No project found with this name. Re-run this script without args to list all projects", CRESET)
+        sys.exit(1)
+    elif len(results) > 1:
+        print(CBOLD+LWARN, "Ambiguous project name, re-run this script without args or specify absolute path", CRESET)
+        sys.exit(1)
 
     release(load_project(project_path))
