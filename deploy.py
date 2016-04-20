@@ -160,6 +160,7 @@ sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
 # Check command line argument
 parser = argparse.ArgumentParser(description='Easily deploy projects')
 parser.add_argument('--self-update', action='store_true', dest='self_update')
+parser.add_argument('path', nargs='?')
 parser.add_argument('--project', default='ask_for_it')
 parser.add_argument('-a', '--all', action='store_true')
 args = parser.parse_args()
@@ -177,6 +178,14 @@ if args.self_update:
 
     print()
     print(LGREEN, "Updated to the latest version", CRESET)
+elif args.path is not None:
+    project_path = os.path.relpath(os.path.join(os.curdir, args.path))
+    if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME)):
+        print("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
+
+    # Load project
+    projects = find_projects()
+    results = [project for project in projects if project['path'] == project_path]
 
 elif args.all:
     projects = find_projects()
@@ -192,6 +201,7 @@ elif args.project == 'ask_for_it':
     projects = find_projects()
 
     print("Please select a project to deploy (^C to exit): '1' or '1, 3, 5'")
+    # List projects
     for i, project in enumerate(projects):
         malformed_conf = True if project['conf'] is None else False
 
