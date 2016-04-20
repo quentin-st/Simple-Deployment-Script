@@ -71,7 +71,10 @@ To use the project, clone this repository anywhere, copy the sample configuratio
         ]
 
 ## How to execute it
-All you have to do is to run `./deploy.py`:
+
+> Tip: you can create an alias for `{install_path}/deploy.py`
+
+All you have to do is to run `deploy`:
 
     root@server:~/Simple-Deployment-Script# ./deploy.py
     Please select a project to deploy
@@ -88,16 +91,18 @@ All you have to do is to run `./deploy.py`:
 
 You can also specify the project you want to deploy as a command line argument:
 
-    ./deploy.py --project project1
+    deploy --project project1
 
 or even use `--all` (or `-a`) to deploy all projects:
 
-    ./deploy.py --all
+    deploy --all
 
-If your project isn't listed when running `./deploy.py` (if it is outside ROOT_DIR for example), you can deploy it anyway
-by specifying its path:
+If your project isn't listed when running `deploy` (if it is outside ROOT_DIR for example), you can deploy it anyway
+by specifying its path (either absolute or relative to current working directory):
 
-    ./deploy.py --project /home/john/website/
+    deploy /home/john/website/
+    deploy ../website
+    deploy .
 
 ### Alias
 You can create an alias to easily execute this command from anywhere:
