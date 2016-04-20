@@ -179,7 +179,11 @@ if args.self_update:
     print()
     print(LGREEN, "Updated to the latest version", CRESET)
 elif args.path is not None:
-    project_path = os.path.relpath(os.path.join(os.curdir, args.path))
+    project_path = os.path.abspath(os.path.join(os.curdir, args.path))
+
+    if not os.path.isdir(project_path):
+        print("This is not a valid directory")
+
     if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME)):
         print("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
 
