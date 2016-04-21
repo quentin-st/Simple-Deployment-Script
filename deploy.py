@@ -14,8 +14,6 @@ import plugins
 from plugins import *
 from config import ROOT_DIR, CONFIG_FILE_NAME
 
-# Here goes the functions
-
 
 def find_projects():
     sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
@@ -190,13 +188,8 @@ elif args.path is not None:
         sys.exit(1)
 
     # Load project
-    projects = find_projects()
-    results = [project for project in projects if project['path'] == project_path]
-
-    if len(results) == 0:
-        print("Error while loading this project configuration")
-
-    release(results[0])
+    project = load_project(project_path)
+    release(project)
 elif args.all:
     projects = find_projects()
 
