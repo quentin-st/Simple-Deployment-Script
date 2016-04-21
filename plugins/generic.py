@@ -17,7 +17,8 @@ class Generic:
         from_dir = os.getcwd()
 
         # If project type is symfony, only lookup for files in src/
-        if project['projectType'] == 'symfony2' or project['projectType'] == 'symfony3':
+        project_type = project['conf'].get("projectType", "generic")
+        if project_type == 'symfony2' or project_type == 'symfony3':
             from_dir = os.path.join(from_dir, 'src')
 
         for root, dirs, files in os.walk(from_dir):
