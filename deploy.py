@@ -140,7 +140,7 @@ def release(project):
         npasses = len(deploy_passes)
         for i, pass_name in enumerate(deploy_passes):
             print(CBOLD, "\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CRESET)
-            getattr(plugin, pass_name + "_pass")()
+            getattr(plugin, pass_name + "_pass")(project)
 
     # Execute custom commands
     commands = conf.get("commands", [])
