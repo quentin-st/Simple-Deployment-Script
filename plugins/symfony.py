@@ -12,7 +12,7 @@ class Symfony(generic.Generic):
         generic_passes = generic.Generic.register_passes(self)
         return generic_passes + ['composer', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
 
-    def composer_pass(self):
+    def composer_pass(self, project):
         if os.path.isfile("composer.phar"):
             composercmd = "php composer.phar"
         else:
@@ -20,19 +20,19 @@ class Symfony(generic.Generic):
 
         stdio.ppexec(composercmd + " -n install --optimize-autoloader")
 
-    def assets_pass(self):
+    def assets_pass(self, project):
         stdio.ppexec(self.app_console + " assets:install")
 
-    def assetic_pass(self):
+    def assetic_pass(self, project):
         stdio.ppexec(self.app_console + " assetic:dump")
 
-    def cache_pass(self):
+    def cache_pass(self, project):
         stdio.ppexec(self.app_console + " cache:clear")
 
-    def liip_imagine_cache_pass(self):
+    def liip_imagine_cache_pass(self, project):
         stdio.ppexec(self.app_console + " liip:imagine:cache:remove")
 
-    def update_database_schema_pass(self):
+    def update_database_schema_pass(self, project):
         stdio.ppexec(self.app_console + " doctrine:schema:update --force")
 
 

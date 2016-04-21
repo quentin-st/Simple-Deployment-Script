@@ -1,6 +1,7 @@
 from utils import stdio
 from plugins import generic
 
+
 def register_variants():
     return [MkDocs]
 
@@ -12,9 +13,9 @@ class MkDocs(generic.Generic):
         generic_passes = generic.Generic.register_passes(self)
         return generic_passes + ['build', '?checkout_dash_dash_site']
 
-    def build_pass(self):
+    def build_pass(self, project):
         stdio.ppexec("mkdocs build --clean")
 
     # Put back files originally present in site/ dir and deleted by mkdocs
-    def checkout_dash_dash_site_pass(self):
+    def checkout_dash_dash_site_pass(self, project):
         stdio.ppexec("git checkout -- site")
