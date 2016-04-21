@@ -183,14 +183,20 @@ elif args.path is not None:
 
     if not os.path.isdir(project_path):
         print("This is not a valid directory")
+        sys.exit(1)
 
     if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME)):
         print("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
+        sys.exit(1)
 
     # Load project
     projects = find_projects()
     results = [project for project in projects if project['path'] == project_path]
 
+    if len(results) == 0:
+        print("Error while loading this project configuration")
+
+    release(results[0])
 elif args.all:
     projects = find_projects()
 
