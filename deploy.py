@@ -204,7 +204,12 @@ try:
     elif args.project == 'ask_for_it':
         projects = find_projects()
 
+        if len(projects) == 0:
+            print("No project found in {}, exiting.".format(ROOT_DIR))
+            sys.exit(1)
+
         print("Please select a project to deploy (^C to exit): '1' or '1, 3, 5'")
+
         # List projects
         for i, project in enumerate(projects):
             malformed_conf = True if project['conf'] is None else False
@@ -246,5 +251,5 @@ try:
 
         release(load_project(project_path))
 except KeyboardInterrupt:
-    print('\n^C signal caught, exiting')
+    print("\n^C signal caught, exiting")
     sys.exit(1)
