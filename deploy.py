@@ -153,94 +153,98 @@ def release(project):
 
 
 # Here goes the code
-sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
+try:
+    sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
 
-# Check command line argument
-parser = argparse.ArgumentParser(description='Easily deploy projects')
-parser.add_argument('--self-update', action='store_true', dest='self_update')
-parser.add_argument('path', nargs='?')
-parser.add_argument('--project', default='ask_for_it')
-parser.add_argument('-a', '--all', action='store_true')
-args = parser.parse_args()
+    # Check command line argument
+    parser = argparse.ArgumentParser(description='Easily deploy projects')
+    parser.add_argument('--self-update', action='store_true', dest='self_update')
+    parser.add_argument('path', nargs='?')
+    parser.add_argument('--project', default='ask_for_it')
+    parser.add_argument('-a', '--all', action='store_true')
+    args = parser.parse_args()
 
-if args.self_update:
-    # cd to own directory
-    self_dir = os.path.dirname(os.path.realpath(__file__))
+    if args.self_update:
+        # cd to own directory
+        self_dir = os.path.dirname(os.path.realpath(__file__))
 
-    if not os.path.isdir(os.path.join(self_dir, '.git')):
-        print(CDIM+LWARN, "Cannot self-update: missing .git directory", CRESET)
-        sys.exit(1)
+        if not os.path.isdir(os.path.join(self_dir, '.git')):
+            print(CDIM+LWARN, "Cannot self-update: missing .git directory", CRESET)
+            sys.exit(1)
 
-    os.chdir(self_dir)
-    os.system("git pull")
+        os.chdir(self_dir)
+        os.system("git pull")
 
-    print()
-    print(LGREEN, "Updated to the latest version", CRESET)
-elif args.path is not None:
-    project_path = os.path.abspath(os.path.join(os.curdir, args.path))
+        print()
+        print(LGREEN, "Updated to the latest version", CRESET)
+    elif args.path is not None:
+        project_path = os.path.abspath(os.path.join(os.curdir, args.path))
 
-    if not os.path.isdir(project_path):
-        print("This is not a valid directory")
-        sys.exit(1)
+        if not os.path.isdir(project_path):
+            print("This is not a valid directory")
+            sys.exit(1)
 
-    if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME)):
-        print("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
-        sys.exit(1)
+        if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME)):
+            print("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
+            sys.exit(1)
 
-    # Load project
-    project = load_project(project_path)
-    release(project)
-elif args.all:
-    projects = find_projects()
+        # Load project
+        project = load_project(project_path)
+        release(project)
+    elif args.all:
+        projects = find_projects()
 
-    # Deploy all projects!
-    if len(projects) > 0:
+        # Deploy all projects!
+        if len(projects) > 0:
+            for i, project in enumerate(projects):
+                release(project)
+        else:
+            print("There is no suitable project in {}".format(sanitized_root_dir))
+
+    elif args.project == 'ask_for_it':
+        projects = find_projects()
+
+        print("Please select a project to deploy (^C to exit): '1' or '1, 3, 5'")
+        # List projects
         for i, project in enumerate(projects):
-            release(project)
+            malformed_conf = True if project['conf'] is None else False
+
+            if malformed_conf:
+                print(CDIM+LWARN, "\t[{}] {} (malformed conf)".format(str(i), project['name']), CRESET)
+            else:
+                target_branch = project['conf'].get("branch", "release")
+                print("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
+
+        # Read user input
+        regex = re.compile('(-?\d+)(,\s*-?d+)?')
+        matches = []
+
+        while len(matches) == 0:
+            matches = regex.findall(input("? "))
+
+            if len(matches) > 0:
+                for match in matches:
+                    index = int(match[0])
+                    if 0 <= index < len(projects):
+                        release(projects[index])
+                    else:
+                        print("Invalid project index {}, ignoring".format(index))
+            else:
+                print("Not a valid sequence. Use either '1' or '1, 3, 5' instead")
     else:
-        print("There is no suitable project in {}".format(sanitized_root_dir))
+        projects = find_projects()
+        project_path = os.path.join(sanitized_root_dir, args.project)
 
-elif args.project == 'ask_for_it':
-    projects = find_projects()
+        results = [project for project in projects if project['path'] == project_path]
 
-    print("Please select a project to deploy (^C to exit): '1' or '1, 3, 5'")
-    # List projects
-    for i, project in enumerate(projects):
-        malformed_conf = True if project['conf'] is None else False
+        if len(results) == 0:
+            print(CBOLD+LRED, "No project found with this name. Re-run this script without args to list all projects", CRESET)
+            sys.exit(1)
+        elif len(results) > 1:
+            print(CBOLD+LWARN, "Ambiguous project name, re-run this script without args or specify absolute path", CRESET)
+            sys.exit(1)
 
-        if malformed_conf:
-            print(CDIM+LWARN, "\t[{}] {} (malformed conf)".format(str(i), project['name']), CRESET)
-        else:
-            target_branch = project['conf'].get("branch", "release")
-            print("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
-
-    # Read user input
-    regex = re.compile('(-?\d+)(,\s*-?d+)?')
-    matches = []
-
-    while len(matches) == 0:
-        matches = regex.findall(input("? "))
-
-        if len(matches) > 0:
-            for match in matches:
-                index = int(match[0])
-                if 0 <= index < len(projects):
-                    release(projects[index])
-                else:
-                    print("Invalid project index {}, ignoring".format(index))
-        else:
-            print("Not a valid sequence. Use either '1' or '1, 3, 5' instead")
-else:
-    projects = find_projects()
-    project_path = os.path.join(sanitized_root_dir, args.project)
-
-    results = [project for project in projects if project['path'] == project_path]
-
-    if len(results) == 0:
-        print(CBOLD+LRED, "No project found with this name. Re-run this script without args to list all projects", CRESET)
-        sys.exit(1)
-    elif len(results) > 1:
-        print(CBOLD+LWARN, "Ambiguous project name, re-run this script without args or specify absolute path", CRESET)
-        sys.exit(1)
-
-    release(load_project(project_path))
+        release(load_project(project_path))
+except KeyboardInterrupt:
+    print('\n^C signal caught, exiting')
+    sys.exit(1)
