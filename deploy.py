@@ -7,6 +7,8 @@ import inspect
 import json
 import re
 
+from operator import itemgetter
+
 from utils import stdio
 from utils.stdio import CRESET, CDIM, CBOLD, LGREEN, LWARN, LRED
 import plugins
@@ -36,7 +38,8 @@ def find_projects():
 
     print()
 
-    return projects
+    # Sort projects by name alphabetically
+    return sorted(projects, key=itemgetter('name'))
 
 
 def load_project(project_path):
