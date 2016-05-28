@@ -154,10 +154,14 @@ You have to properly setup permissions in order to avoid errors. You could use t
 
     cd /path/to/project
     HTTPDUSER=`ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
+
+    # Symfony2
     sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
     sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
 
-In Symfony 3, replace `app/cache` with `var/cache` and `app/logs` with `var/logs`.
+    # Symfony3
+    sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX var/cache var/logs var/sessions
+    sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX var/cache var/logs var/sessions
 
 This will give write rights to your HTTP server on the Symfony log and cache files, while your own permissions are left intact.
 
