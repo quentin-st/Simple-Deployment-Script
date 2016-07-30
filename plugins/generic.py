@@ -12,7 +12,7 @@ class Generic:
     def register_passes(self):
         return ['?bower', '?scss']
 
-    def bower_pass(self):
+    def bower_pass(self, project):
         stdio.ppexec("bower install")
 
     def scss_pass(self, project):
