@@ -10,7 +10,10 @@ class Generic:
     key_name = "generic"
 
     def register_passes(self):
-        return ['?scss']
+        return ['?bower', '?scss']
+
+    def bower_pass(self):
+        stdio.ppexec("bower install")
 
     def scss_pass(self, project):
         # Let's find SCSS files inside this project
@@ -26,6 +29,3 @@ class Generic:
                 if file.endswith(".scss") and not file.startswith("_"):  # Exclude SCSS part files (_part.scss)
                     abs_path = os.path.join(root, file)
                     stdio.ppexec("sass " + abs_path + " " + abs_path.replace(".scss", ".css") + " --style compressed")
-
-    def bower_pass(self):
-        stdio.ppexec("bower install")
