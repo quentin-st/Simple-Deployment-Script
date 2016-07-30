@@ -159,6 +159,14 @@ sudo gem install sass
 sass -v
 ```
 
+#### bower pass
+This pass simply runs the `bower install` command. You can install bower by following these steps:
+
+```shell
+npm install -g bower
+bower -v
+```
+
 ### Symfony 2 and 3
 
 | Pass name & order  | Enabled by default | Description                                                       |
