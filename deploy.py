@@ -17,7 +17,7 @@ from plugins import *
 from config import ROOT_DIR
 
 CONFIG_FILE_NAME = 'deploy.json'
-CONFIG_FILE_NAME_DEPRECATED = ['deploy.json']
+CONFIG_FILE_NAME_DEPRECATED = 'deploy.json'
 
 
 def find_projects():
