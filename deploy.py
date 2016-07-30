@@ -200,7 +200,7 @@ try:
             sys.exit(1)
 
         if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME))\
-                or not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME_DEPRECATED)):
+                and not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME_DEPRECATED)):
             print("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
             sys.exit(1)
 
