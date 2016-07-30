@@ -56,7 +56,7 @@ def load_project(project_path):
     # Handle both deprecated & preferred conf filenames
     conf_path = os.path.join(project_path, CONFIG_FILE_NAME)
     if not os.path.isfile(conf_path):
-        print(LWARN, "\tWarning: '{}' as filename is deprecated, consider using '{}' instead.".format(
+        print(LWARN, "Warning: '{}' as filename is deprecated, consider renaming it to '{}'.".format(
             CONFIG_FILE_NAME_DEPRECATED, CONFIG_FILE_NAME
         ))
         conf_path = os.path.join(project_path, CONFIG_FILE_NAME_DEPRECATED)
@@ -99,7 +99,7 @@ def release(project):
 
     # Conf is malformed
     if conf is None:
-        print(CBOLD + LRED, "\nMalformed config file ({})".format(project['conf_path']), CRESET)
+        print(CBOLD + LRED, "\nMalformed config file ({})".format(conf_path), CRESET)
         return
 
     # Read conf
@@ -126,6 +126,10 @@ def release(project):
         os.system("git pull")
 
         # Get an updated version of the conf, if the config file has changed after the pull
+        # Handle case where conf_path gets renamed to non-deprecated version
+        if not os.path.isfile(conf_path):
+            project['conf_path'] = conf_path = os.path.join(project_path, CONFIG_FILE_NAME)
+
         conf = parse_conf(conf_path)
         forced_passes = conf.get("passes", "").split()
 
