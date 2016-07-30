@@ -5,18 +5,22 @@ This simple python script can be used to manage Git-managed websites/projects on
 ## deploy.conf.json
 Each project should contain the following file in its root directory:
 
-    # deploy.conf.json
+```json
+# deploy.conf.json
 
-    {
-        "projectType":  "symfony2",
-        "branch":       "release",
-        "passes":       "+do_something -but_not_that"
-    }
+{
+    "projectType":  "symfony2",
+    "branch":       "release",
+    "passes":       "+do_something -but_not_that"
+}
+```
 
 To use the project, clone this repository anywhere, copy the sample configuration file in each of your projects an edit it:
 
-    cp ~/Simple-Deployment-Script/sample-deploy.conf.json /var/www/project/deploy.conf.json
-    vim /var/www/project/deploy.conf.json
+```shell
+cp ~/Simple-Deployment-Script/sample-deploy.conf.json /var/www/project/deploy.conf.json
+vim /var/www/project/deploy.conf.json
+```
 
 *Here are the configuration keys (all keys are optional):*
 
@@ -65,10 +69,12 @@ To use the project, clone this repository anywhere, copy the sample configuratio
     You can run custom commands that are either not handled by this scripts, or project-specific. Your deploy.conf.json
     file must contain all commands in the `commands` array:
     
-        "commands": [
-            "ls -l",
-            "git status"
-        ]
+    ```json
+    "commands": [
+        "ls -l",
+        "git status"
+    ]
+    ```
 
 ## How to execute it
 
@@ -76,41 +82,51 @@ To use the project, clone this repository anywhere, copy the sample configuratio
 
 All you have to do is to run `deploy`:
 
-    root@server:~/Simple-Deployment-Script# ./deploy.py
-    Please select a project to deploy
-        [0] project1 (master)
-        [1] project2 (release)
-        [2] project3 (release)
-        [3] project4 (pre-prod)
-    ? 1
-    Already on 'release'
-    Already up-to-date.
-    Release finished. Have an A1 day!
+```shell
+root@server:~/Simple-Deployment-Script# ./deploy.py
+Please select a project to deploy
+    [0] project1 (master)
+    [1] project2 (release)
+    [2] project3 (release)
+    [3] project4 (pre-prod)
+? 1
+Already on 'release'
+Already up-to-date.
+Release finished. Have an A1 day!
+```
 
 > Tip: you can specify a sequence of integers such as `0, 1, 3` to deploy several projects in a row
 
 You can also specify the project you want to deploy as a command line argument:
 
-    deploy --project project1
+```shell
+deploy --project project1
+```
 
 or even use `--all` (or `-a`) to deploy all projects:
 
-    deploy --all
+```shell
+deploy --all
+```
 
 If your project isn't listed when running `deploy` (if it is outside ROOT_DIR for example), you can deploy it anyway
 by specifying its path (either absolute or relative to current working directory):
 
-    deploy /home/john/website/
-    deploy ../website
-    deploy .
+```shell
+deploy /home/john/website/
+deploy ../website
+deploy .
+```
 
 ### Alias
 You can create an alias to easily execute this command from anywhere:
 
-    # ~/.bashrc
-    # ...
+```shell
+# ~/.bashrc
+# ...
 
-    alias deploy='/root/Simple-Deployment-Script/deploy.py'
+alias deploy='/root/Simple-Deployment-Script/deploy.py'
+```
 
 Execute `source ~/.bashrc` to take changes into account in your current session. You'll then be able to execute
 `deploy --project my_project` from any directory.
@@ -118,7 +134,9 @@ Execute `source ~/.bashrc` to take changes into account in your current session.
 ## About plugins output encoding
 Depending on your server's encoding, you may have to explicit `PYTHONIOENCODING` environment variable to force it to UTF-8:
 
-    export PYTHONIOENCODING=utf_8
+```shell
+export PYTHONIOENCODING=utf_8
+```
 
 Check [here](http://unix.stackexchange.com/a/117470) to read more about making this setting persistent.
 
@@ -135,9 +153,11 @@ All passes defined in this plugin are disabled by default and can be used in all
 This pass browses your project to find `.scss` files. Please note that it won't compile SASS part files (`_part.scss`).
 This pass uses the `sass` command to compile files. You can install it by following these steps:
 
-    sudo apt-get install rubygems
-    sudo gem install sass
-    sass -v
+```shell
+sudo apt-get install rubygems
+sudo gem install sass
+sass -v
+```
 
 ### Symfony 2 and 3
 
@@ -152,10 +172,12 @@ This pass uses the `sass` command to compile files. You can install it by follow
 #### Permissions
 You have to properly setup permissions in order to avoid errors. You could use the ACLs (a more advanced way to manage permissions than POSIX file modes):
 
-    cd /path/to/project
-    HTTPDUSER=`ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
-    sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
-    sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
+```shell
+cd /path/to/project
+HTTPDUSER=`ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
+sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
+sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
+```
 
 In Symfony 3, replace `app/cache` with `var/cache` and `app/logs` with `var/logs`.
 
@@ -165,10 +187,12 @@ This will give write rights to your HTTP server on the Symfony log and cache fil
 When using liip_imagine_cache pass, you should also setup proper permissions: yourself & HTTPD user should be able to write
 to Liip's Imagine Bundle cache directory:
 
-    cd /path/to/project
-    HTTPDUSER=`ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
-    sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media
-    sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media
+```shell
+cd /path/to/project
+HTTPDUSER=`ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
+sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media
+sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX web/media
+```
 
 ### Other plugins
 Here are the other available plugins shipped with this script:
