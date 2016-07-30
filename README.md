@@ -2,11 +2,11 @@
 
 This simple python script can be used to manage Git-managed websites/projects on a production server.
 
-## deploy.conf.json
+## deploy.json
 Each project should contain the following file in its root directory:
 
 ```json
-# deploy.conf.json
+# deploy.json
 
 {
     "projectType":  "symfony2",
@@ -18,8 +18,8 @@ Each project should contain the following file in its root directory:
 To use the project, clone this repository anywhere, copy the sample configuration file in each of your projects an edit it:
 
 ```shell
-cp ~/Simple-Deployment-Script/sample-deploy.conf.json /var/www/project/deploy.conf.json
-vim /var/www/project/deploy.conf.json
+cp ~/Simple-Deployment-Script/deploy-sample.json /var/www/project/deploy.json
+vim /var/www/project/deploy.json
 ```
 
 *Here are the configuration keys (all keys are optional):*
@@ -66,7 +66,7 @@ vim /var/www/project/deploy.conf.json
 
  - `commands`
     
-    You can run custom commands that are either not handled by this scripts, or project-specific. Your deploy.conf.json
+    You can run custom commands that are either not handled by this scripts, or project-specific. Your deploy.json
     file must contain all commands in the `commands` array:
     
     ```json

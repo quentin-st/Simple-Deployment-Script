@@ -12,9 +12,12 @@ from operator import itemgetter
 from utils import stdio
 from utils.stdio import CRESET, CDIM, CBOLD, LGREEN, LWARN, LRED
 import plugins
-# The following line is necessary in order for project types to be found
+# The following line is necessary for project types to be found
 from plugins import *
-from config import ROOT_DIR, CONFIG_FILE_NAME
+from config import ROOT_DIR
+
+CONFIG_FILE_NAME = ['deploy.json']
+CONFIG_FILE_NAME_DEPRECATED = ['deploy.json']
 
 
 def find_projects():
@@ -25,7 +28,7 @@ def find_projects():
     print(CDIM, "Scanning {} for {} files".format(sanitized_root_dir, CONFIG_FILE_NAME), CRESET)
     for root, dirs, files in os.walk(sanitized_root_dir):
         for file in files:
-            if file == CONFIG_FILE_NAME:
+            if file == CONFIG_FILE_NAME or file == CONFIG_FILE_NAME_DEPRECATED:
                 file_path = os.path.join(root, file)
                 project = load_project(root)
                 malformed_conf = True if project['conf'] is None else False
@@ -34,6 +37,7 @@ def find_projects():
                     os.path.relpath(file_path, sanitized_root_dir),
                     '(malformed)' if malformed_conf else ''
                 ), CRESET)
+
                 projects.append(project)
 
     print()
@@ -48,7 +52,14 @@ def load_project(project_path):
         project_name = os.path.relpath(project_path, ROOT_DIR)
     else:
         project_name = os.path.basename(os.path.normpath(project_path))
+
+    # Handle both deprecated & preferred conf filenames
     conf_path = os.path.join(project_path, CONFIG_FILE_NAME)
+    if not os.path.isfile(conf_path):
+        print(LWARN, "\tWarning: '{}' as filename is deprecated, consider using '{}' instead.".format(
+            CONFIG_FILE_NAME_DEPRECATED, CONFIG_FILE_NAME
+        ))
+        conf_path = os.path.join(project_path, CONFIG_FILE_NAME_DEPRECATED)
 
     # Try to parse conf (a malformed conf file may prevent one from deploying at all)
     try:
@@ -84,6 +95,7 @@ def release(project):
     project_name = project['name']
     project_path = project['path']
     conf = project['conf']
+    conf_path = project['conf_path']
 
     # Conf is malformed
     if conf is None:
@@ -114,7 +126,7 @@ def release(project):
         os.system("git pull")
 
         # Get an updated version of the conf, if the config file has changed after the pull
-        conf = parse_conf(os.path.join(project_path, CONFIG_FILE_NAME))
+        conf = parse_conf(conf_path)
         forced_passes = conf.get("passes", "").split()
 
     # Determine plugin-specific passes
@@ -187,7 +199,8 @@ try:
             print("This is not a valid directory")
             sys.exit(1)
 
-        if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME)):
+        if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME))\
+                and not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME_DEPRECATED)):
             print("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
             sys.exit(1)
 
