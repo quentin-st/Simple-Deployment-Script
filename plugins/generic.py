@@ -13,7 +13,7 @@ class Generic:
         return ['?bower', '?scss']
 
     def bower_pass(self, project):
-        stdio.ppexec("bower install")
+        stdio.ppexec("bower install --allow-root")
 
     def scss_pass(self, project):
         # Let's find SCSS files inside this project
