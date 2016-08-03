@@ -31,12 +31,17 @@ def find_projects():
             if file == CONFIG_FILE_NAME or file == CONFIG_FILE_NAME_DEPRECATED:
                 file_path = os.path.join(root, file)
                 project = load_project(root)
-                malformed_conf = True if project['conf'] is None else False
+                conf_malformed = True if project['conf'] is None else False
+                conf_deprecated = file == CONFIG_FILE_NAME_DEPRECATED
 
-                print(CDIM+LWARN if malformed_conf else CDIM, "\tFound ~/{} {}".format(
-                    os.path.relpath(file_path, sanitized_root_dir),
-                    '(malformed)' if malformed_conf else ''
-                ), CRESET)
+                color = CDIM+LWARN if conf_malformed or conf_deprecated else CDIM
+                suffix = ''
+                if conf_malformed:
+                    suffix = '(malformed)'
+                elif conf_deprecated:
+                    suffix = '(deprecated conf file format)'
+
+                print(color, "\tFound ~/{} {}".format(os.path.relpath(file_path, sanitized_root_dir), suffix), CRESET)
 
                 projects.append(project)
 
@@ -56,9 +61,6 @@ def load_project(project_path):
     # Handle both deprecated & preferred conf filenames
     conf_path = os.path.join(project_path, CONFIG_FILE_NAME)
     if not os.path.isfile(conf_path):
-        print(LWARN, "Warning: '{}' as filename is deprecated, consider renaming it to '{}'.".format(
-            CONFIG_FILE_NAME_DEPRECATED, CONFIG_FILE_NAME
-        ))
         conf_path = os.path.join(project_path, CONFIG_FILE_NAME_DEPRECATED)
 
     # Try to parse conf (a malformed conf file may prevent one from deploying at all)
@@ -96,6 +98,11 @@ def release(project):
     project_path = project['path']
     conf = project['conf']
     conf_path = project['conf_path']
+
+    if conf_path.endswith(CONFIG_FILE_NAME_DEPRECATED):
+        print(LWARN, "Warning: '{}' as filename is deprecated, consider renaming it to '{}'.".format(
+            CONFIG_FILE_NAME_DEPRECATED, CONFIG_FILE_NAME
+        ))
 
     # Conf is malformed
     if conf is None:
