@@ -14,4 +14,4 @@ class Jekyll(generic.Generic):
         return generic_passes + ['build']
 
     def build_pass(self, project):
-        stdio.ppexec("jekyll build")
+        return stdio.ppexec("jekyll build")

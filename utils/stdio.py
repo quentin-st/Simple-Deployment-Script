@@ -23,3 +23,7 @@ def ppexec(cmd):
             print(CDIM + "    " + line.decode(sys.stdout.encoding) + CRESET)
         except UnicodeDecodeError:
             print(CDIM + "    " + line.decode('windows-1252') + CRESET)
+
+    # Wait for process to finish so we can get its return value
+    p.wait()
+    return p.returncode

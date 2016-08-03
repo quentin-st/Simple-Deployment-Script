@@ -18,22 +18,22 @@ class Symfony(generic.Generic):
         else:
             composercmd = "composer"
 
-        stdio.ppexec(composercmd + " -n install --optimize-autoloader")
+        return stdio.ppexec(composercmd + " -n install --optimize-autoloader")
 
     def assets_pass(self, project):
-        stdio.ppexec(self.app_console + " assets:install")
+        return stdio.ppexec(self.app_console + " assets:install")
 
     def assetic_pass(self, project):
-        stdio.ppexec(self.app_console + " assetic:dump")
+        return stdio.ppexec(self.app_console + " assetic:dump")
 
     def cache_pass(self, project):
-        stdio.ppexec(self.app_console + " cache:clear")
+        return stdio.ppexec(self.app_console + " cache:clear")
 
     def liip_imagine_cache_pass(self, project):
-        stdio.ppexec(self.app_console + " liip:imagine:cache:remove")
+        return stdio.ppexec(self.app_console + " liip:imagine:cache:remove")
 
     def update_database_schema_pass(self, project):
-        stdio.ppexec(self.app_console + " doctrine:schema:update --force")
+        return stdio.ppexec(self.app_console + " doctrine:schema:update --force")
 
 
 class Symfony2(Symfony):

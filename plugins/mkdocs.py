@@ -14,8 +14,8 @@ class MkDocs(generic.Generic):
         return generic_passes + ['build', '?checkout_dash_dash_site']
 
     def build_pass(self, project):
-        stdio.ppexec("mkdocs build --clean")
+        return stdio.ppexec("mkdocs build --clean")
 
     # Put back files originally present in site/ dir and deleted by mkdocs
     def checkout_dash_dash_site_pass(self, project):
-        stdio.ppexec("git checkout -- site")
+        return stdio.ppexec("git checkout -- site")

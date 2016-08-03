@@ -120,10 +120,18 @@ def release(project):
 
     # Check if either git_checkout or git_pull special passes are disabled
     if "-git_checkout" not in forced_passes:
-        os.system("git checkout " + branch)
+        e = os.system("git checkout " + branch)
+
+        if e != 0:
+            print(CBOLD + LWARN, 'git checkout command finished with non-zero exit value, aborting deploy')
+            return
 
     if "-git_pull" not in forced_passes:
-        os.system("git pull")
+        e = os.system("git pull")
+
+        if e != 0:
+            print(CBOLD + LWARN, 'git pull command finished with non-zero exit value, aborting deploy')
+            return
 
         # Get an updated version of the conf, if the config file has changed after the pull
         # Handle case where conf_path gets renamed to non-deprecated version
@@ -157,7 +165,13 @@ def release(project):
         npasses = len(deploy_passes)
         for i, pass_name in enumerate(deploy_passes):
             print(CBOLD, "\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CRESET)
-            getattr(plugin, pass_name + "_pass")(project)
+            e = getattr(plugin, pass_name + "_pass")(project)
+
+            if e != 0:
+                print(CBOLD + LWARN, "Pass '{}' finished with non-zero ({}) exit value, aborting deploy".format(
+                    pass_name, e
+                ))
+                return
 
     # Execute custom commands
     commands = conf.get("commands", [])
@@ -165,7 +179,13 @@ def release(project):
         print(CBOLD + LGREEN, "\nExecuting custom commands", CRESET)
 
         for command in commands:
-            stdio.ppexec(command)
+            e = stdio.ppexec(command)
+
+            if e != 0:
+                print(CBOLD + LWARN, "Custom command finished with non-zero ({}) exit value, aborting deploy.".format(
+                    e
+                ))
+                return
 
     # The End
     print(CBOLD+LGREEN, "\n==> {} successfully deployed. Have an A1 day!\n".format(project_path), CRESET)
