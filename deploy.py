@@ -102,7 +102,7 @@ def release(project):
     if conf_path.endswith(CONFIG_FILE_NAME_DEPRECATED):
         print(LWARN, "Warning: '{}' as filename is deprecated, consider renaming it to '{}'.".format(
             CONFIG_FILE_NAME_DEPRECATED, CONFIG_FILE_NAME
-        ))
+        ), CRESET)
 
     # Conf is malformed
     if conf is None:
@@ -130,14 +130,14 @@ def release(project):
         e = os.system("git checkout " + branch)
 
         if e != 0:
-            print(CBOLD + LWARN, 'git checkout command finished with non-zero exit value, aborting deploy')
+            print(CBOLD + LWARN, 'git checkout command finished with non-zero exit value, aborting deploy', CRESET)
             return
 
     if "-git_pull" not in forced_passes:
         e = os.system("git pull")
 
         if e != 0:
-            print(CBOLD + LWARN, 'git pull command finished with non-zero exit value, aborting deploy')
+            print(CBOLD + LWARN, 'git pull command finished with non-zero exit value, aborting deploy', CRESET)
             return
 
         # Get an updated version of the conf, if the config file has changed after the pull
@@ -177,7 +177,7 @@ def release(project):
             if e != 0:
                 print(CBOLD + LWARN, "Pass '{}' finished with non-zero ({}) exit value, aborting deploy".format(
                     pass_name, e
-                ))
+                ), CRESET)
                 return
 
     # Execute custom commands
@@ -191,7 +191,7 @@ def release(project):
             if e != 0:
                 print(CBOLD + LWARN, "Custom command finished with non-zero ({}) exit value, aborting deploy.".format(
                     e
-                ))
+                ), CRESET)
                 return
 
     # The End
