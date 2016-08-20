@@ -163,7 +163,8 @@ def release(project):
         if "-"+pass_name in forced_passes:
             continue
 
-        deploy_passes.append(pass_name)
+        if pass_name not in deploy_passes:
+            deploy_passes.append(pass_name)
 
     if len(deploy_passes) > 0:
         print(CBOLD+LGREEN, "\n==> Deployment starting with passes: {}".format(", ".join(deploy_passes)), CRESET)
