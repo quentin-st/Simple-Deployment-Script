@@ -148,6 +148,7 @@ All passes defined in this plugin are disabled by default and can be used in all
 | Pass name & order  | Enabled by default | Description                                                       |
 | ------------------ | ------------------ | ----------------------------------------------------------------- |
 | scss               |                    | Compiles SCSS files inside project                                |
+| bower              |                    | Updates bower dependencies                                        |
 
 #### scss pass
 This pass browses your project to find `.scss` files. Please note that it won't compile SASS part files (`_part.scss`).
