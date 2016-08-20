@@ -10,7 +10,15 @@ class Generic:
     key_name = "generic"
 
     def register_passes(self):
-        return ['?bower', '?scss']
+        return ['?composer', '?bower', '?scss']
+
+    def composer_pass(self, project):
+        if os.path.isfile("composer.phar"):
+            composercmd = "php composer.phar"
+        else:
+            composercmd = "composer"
+
+        return stdio.ppexec(composercmd + " -n install --optimize-autoloader")
 
     def bower_pass(self, project):
         return stdio.ppexec("bower install --allow-root")
