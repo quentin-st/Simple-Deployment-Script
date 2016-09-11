@@ -107,7 +107,7 @@ def release(project):
     # Conf is malformed
     if conf is None:
         print(CBOLD + LRED, "\nMalformed config file ({})".format(conf_path), CRESET)
-        return
+        return False
 
     # Read conf
     project_type = conf.get("projectType", "generic")
@@ -120,7 +120,7 @@ def release(project):
     types = get_supported_project_types()
     if project_type not in types:
         print(CBOLD + LWARN, "Unknown project type \"{}\".".format(project_type), CRESET)
-        return
+        return False
 
     # Let's go!
     os.chdir(project_path)
@@ -131,14 +131,14 @@ def release(project):
 
         if e != 0:
             print(CBOLD + LWARN, 'git checkout command finished with non-zero exit value, aborting deploy', CRESET)
-            return
+            return False
 
     if "-git_pull" not in forced_passes:
         e = os.system("git pull")
 
         if e != 0:
             print(CBOLD + LWARN, 'git pull command finished with non-zero exit value, aborting deploy', CRESET)
-            return
+            return False
 
         # Get an updated version of the conf, if the config file has changed after the pull
         # Handle case where conf_path gets renamed to non-deprecated version
@@ -179,7 +179,7 @@ def release(project):
                 print(CBOLD + LWARN, "Pass '{}' finished with non-zero ({}) exit value, aborting deploy".format(
                     pass_name, e
                 ), CRESET)
-                return
+                return False
 
     # Execute custom commands
     commands = conf.get("commands", [])
@@ -193,10 +193,11 @@ def release(project):
                 print(CBOLD + LWARN, "Custom command finished with non-zero ({}) exit value, aborting deploy.".format(
                     e
                 ), CRESET)
-                return
+                return False
 
     # The End
     print(CBOLD+LGREEN, "\n==> {} successfully deployed. Have an A1 day!\n".format(project_path), CRESET)
+    return True
 
 
 # Here goes the code
@@ -238,7 +239,8 @@ try:
 
         # Load project
         project = load_project(project_path)
-        release(project)
+        success = release(project)
+        sys.exit(0 if success else 1)
     elif args.all:
         projects = find_projects()
 
@@ -297,7 +299,8 @@ try:
             print(CBOLD+LWARN, "Ambiguous project name, re-run this script without args or specify absolute path", CRESET)
             sys.exit(1)
 
-        release(load_project(project_path))
+        success = release(load_project(project_path))
+        sys.exit(0 if success else 1)
 except KeyboardInterrupt:
     print("\n^C signal caught, exiting")
     sys.exit(1)
