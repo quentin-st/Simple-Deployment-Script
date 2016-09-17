@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+""" Easy & simple yet flexible production deployment script """
+
 import argparse
 import os
 import sys
@@ -15,6 +18,16 @@ import plugins
 # The following line is necessary for project types to be found
 from plugins import *
 from config import ROOT_DIR
+
+__author__ = 'Quentin Stoeckel'
+__copyright__ = 'Copyright 2016, Quentin Stoeckel and contributors'
+__credits__ = ['Contributors at https://github.com/chteuchteu/Simple-Deployment-Script/graphs/contributors']
+
+__license__ = 'gpl-v2'
+__version__ = '1.0.0'
+__maintainer__ = "qstoeckel"
+__email__ = 'stoeckel.quentin@gmail.com'
+__status__ = 'Production'
 
 CONFIG_FILE_NAME = 'deploy.json'
 CONFIG_FILE_NAME_DEPRECATED = 'deploy.conf.json'
