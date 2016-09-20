@@ -10,7 +10,7 @@ class Generic:
     key_name = "generic"
 
     def register_passes(self):
-        return ['?composer', '?bower', '?scss', '?gulp']
+        return ['?composer', '?bower', '?scss', '?gulp', '?npm']
 
     def composer_pass(self, project):
         if os.path.isfile("composer.phar"):
@@ -48,3 +48,6 @@ class Generic:
 
     def gulp_pass(self, project):
         return stdio.ppexec("gulp")
+
+    def npm_pass(self, project):
+        return stdio.ppexec("npm install")
