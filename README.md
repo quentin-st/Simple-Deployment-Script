@@ -150,6 +150,7 @@ All passes defined in this plugin are disabled by default and can be used in all
 | scss               |                    | Compiles SCSS files inside project                                |
 | bower              |                    | Updates bower dependencies                                        |
 | composer           |                    | Runs `composer install`                                           |
+| gulp               |                    | Runs default gulp task                                            |
 
 #### scss pass
 This pass browses your project to find `.scss` files. Please note that it won't compile SASS part files (`_part.scss`).
