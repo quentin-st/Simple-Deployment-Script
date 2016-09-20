@@ -10,7 +10,7 @@ class Generic:
     key_name = "generic"
 
     def register_passes(self):
-        return ['?composer', '?bower', '?scss', '?gulp', '?npm']
+        return ['?composer', '?npm', '?bower', '?scss', '?gulp']
 
     def composer_pass(self, project):
         if os.path.isfile("composer.phar"):
