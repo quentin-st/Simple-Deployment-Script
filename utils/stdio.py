@@ -19,8 +19,13 @@ def ppexec(cmd):
         if line == empty_line:
             continue
 
+        encoding = sys.stdout.encoding
+
+        if encoding is None:
+            encoding = 'utf-8'
+
         try:
-            print(CDIM + "    " + line.decode(sys.stdout.encoding) + CRESET)
+            print(CDIM + "    " + line.decode(encoding) + CRESET)
         except UnicodeDecodeError:
             print(CDIM + "    " + line.decode('windows-1252') + CRESET)
 
