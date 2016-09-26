@@ -9,6 +9,19 @@ LWARN  = "\033[93m"
 LRED   = "\033[91m"
 
 
+class Printer:
+    colorize = True
+
+    def __init__(self, colorize):
+        self.colorize = colorize
+
+    def print(self, text, color=None):
+        if color is not None and self.colorize:
+            print(color, text, CRESET)
+        else:
+            print(text)
+
+
 def ppexec(cmd):
     print("    [$ {}]".format(cmd))
     empty_line = bytes()

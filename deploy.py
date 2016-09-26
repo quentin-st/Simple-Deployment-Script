@@ -13,7 +13,7 @@ import re
 from operator import itemgetter
 
 from utils import stdio
-from utils.stdio import CRESET, CDIM, CBOLD, LGREEN, LWARN, LRED
+from utils.stdio import CRESET, CDIM, CBOLD, LGREEN, LWARN, LRED, Printer
 import plugins
 # The following line is necessary for project types to be found
 from plugins import *
@@ -38,7 +38,7 @@ def find_projects():
     projects = []
 
     # Recursively find config file in ROOT_DIR
-    print(CDIM, "Scanning {} for {} files".format(sanitized_root_dir, CONFIG_FILE_NAME), CRESET)
+    printer.print("Scanning {} for {} files".format(sanitized_root_dir, CONFIG_FILE_NAME), CDIM)
     for root, dirs, files in os.walk(sanitized_root_dir):
         for file in files:
             if file == CONFIG_FILE_NAME or file == CONFIG_FILE_NAME_DEPRECATED:
@@ -54,7 +54,7 @@ def find_projects():
                 elif conf_deprecated:
                     suffix = '(deprecated conf file format)'
 
-                print(color, "\tFound ~/{} {}".format(os.path.relpath(file_path, sanitized_root_dir), suffix), CRESET)
+                printer.print("\tFound ~/{} {}".format(os.path.relpath(file_path, sanitized_root_dir), suffix), color)
 
                 projects.append(project)
 
@@ -113,13 +113,13 @@ def release(project):
     conf_path = project['conf_path']
 
     if conf_path.endswith(CONFIG_FILE_NAME_DEPRECATED):
-        print(LWARN, "Warning: '{}' as filename is deprecated, consider renaming it to '{}'.".format(
+        printer.print("Warning: '{}' as filename is deprecated, consider renaming it to '{}'.".format(
             CONFIG_FILE_NAME_DEPRECATED, CONFIG_FILE_NAME
-        ), CRESET)
+        ), LWARN)
 
     # Conf is malformed
     if conf is None:
-        print(CBOLD + LRED, "\nMalformed config file ({})".format(conf_path), CRESET)
+        printer.print("\nMalformed config file ({})".format(conf_path), CBOLD + LRED)
         return False
 
     # Read conf
@@ -127,12 +127,12 @@ def release(project):
     branch = conf.get("branch", "release")
     forced_passes = conf.get("passes", "").split()
 
-    print(CBOLD + LGREEN, "\nDeploying project {} ({})".format(project_name, branch), CRESET)
+    printer.print("\nDeploying project {} ({})".format(project_name, branch), CBOLD + LGREEN)
 
     # Check the project type
     types = get_supported_project_types()
     if project_type not in types:
-        print(CBOLD + LWARN, "Unknown project type \"{}\".".format(project_type), CRESET)
+        printer.print("Unknown project type \"{}\".".format(project_type), CBOLD + LWARN)
         return False
 
     # Let's go!
@@ -143,14 +143,14 @@ def release(project):
         e = os.system("git checkout " + branch)
 
         if e != 0:
-            print(CBOLD + LWARN, 'git checkout command finished with non-zero exit value, aborting deploy', CRESET)
+            printer.print('git checkout command finished with non-zero exit value, aborting deploy', CBOLD + LWARN)
             return False
 
     if "-git_pull" not in forced_passes:
         e = os.system("git pull")
 
         if e != 0:
-            print(CBOLD + LWARN, 'git pull command finished with non-zero exit value, aborting deploy', CRESET)
+            printer.print('git pull command finished with non-zero exit value, aborting deploy', CBOLD + LWARN)
             return False
 
         # Get an updated version of the conf, if the config file has changed after the pull
@@ -180,36 +180,36 @@ def release(project):
             deploy_passes.append(pass_name)
 
     if len(deploy_passes) > 0:
-        print(CBOLD+LGREEN, "\n==> Deployment starting with passes: {}".format(", ".join(deploy_passes)), CRESET)
+        pritner.print("\n==> Deployment starting with passes: {}".format(", ".join(deploy_passes)), CBOLD+LGREEN)
 
         # Start env-specific passes
         npasses = len(deploy_passes)
         for i, pass_name in enumerate(deploy_passes):
-            print(CBOLD, "\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CRESET)
+            printer.print("\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CBOLD)
             e = getattr(plugin, pass_name + "_pass")(project)
 
             if e != 0:
-                print(CBOLD + LWARN, "Pass '{}' finished with non-zero ({}) exit value, aborting deploy".format(
+                printer.print("Pass '{}' finished with non-zero ({}) exit value, aborting deploy".format(
                     pass_name, e
-                ), CRESET)
+                ), CBOLD + LWARN)
                 return False
 
     # Execute custom commands
     commands = conf.get("commands", [])
     if len(commands) > 0:
-        print(CBOLD + LGREEN, "\nExecuting custom commands", CRESET)
+        printer.print("\nExecuting custom commands", CBOLD + LGREEN)
 
         for command in commands:
             e = stdio.ppexec(command)
 
             if e != 0:
-                print(CBOLD + LWARN, "Custom command finished with non-zero ({}) exit value, aborting deploy.".format(
+                printer.print("Custom command finished with non-zero ({}) exit value, aborting deploy.".format(
                     e
-                ), CRESET)
+                ), CBOLD + LWARN)
                 return False
 
     # The End
-    print(CBOLD+LGREEN, "\n==> {} successfully deployed. Have an A1 day!\n".format(project_path), CRESET)
+    printer.print("\n==> {} successfully deployed. Have an A1 day!\n".format(project_path), CBOLD+LGREEN)
     return True
 
 
@@ -223,21 +223,24 @@ try:
     parser.add_argument('path', nargs='?')
     parser.add_argument('--project', default='ask_for_it')
     parser.add_argument('-a', '--all', action='store_true')
+    parser.add_argument('--no-color', action='store_true', dest='no_color')
     args = parser.parse_args()
+
+    printer = Printer(not args.no_color)
 
     if args.self_update:
         # cd to own directory
         self_dir = os.path.dirname(os.path.realpath(__file__))
 
         if not os.path.isdir(os.path.join(self_dir, '.git')):
-            print(CDIM+LWARN, "Cannot self-update: missing .git directory", CRESET)
+            printer.print("Cannot self-update: missing .git directory", CDIM+LWARN)
             sys.exit(1)
 
         os.chdir(self_dir)
         os.system("git pull")
 
         print()
-        print(LGREEN, "Updated to the latest version", CRESET)
+        printer.print("Updated to the latest version", LGREEN)
     elif args.path is not None:
         project_path = os.path.abspath(os.path.join(os.curdir, args.path))
 
@@ -278,7 +281,7 @@ try:
             malformed_conf = True if project['conf'] is None else False
 
             if malformed_conf:
-                print(CDIM+LWARN, "\t[{}] {} (malformed conf)".format(str(i), project['name']), CRESET)
+                printer.print("\t[{}] {} (malformed conf)".format(str(i), project['name']), CDIM+LWARN)
             else:
                 target_branch = project['conf'].get("branch", "release")
                 print("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
@@ -306,10 +309,10 @@ try:
         results = [project for project in projects if project['path'] == project_path]
 
         if len(results) == 0:
-            print(CBOLD+LRED, "No project found with this name. Re-run this script without args to list all projects", CRESET)
+            printer.print("No project found with this name. Re-run this script without args to list all projects", CBOLD+LRED)
             sys.exit(1)
         elif len(results) > 1:
-            print(CBOLD+LWARN, "Ambiguous project name, re-run this script without args or specify absolute path", CRESET)
+            print("Ambiguous project name, re-run this script without args or specify absolute path", CBOLD+LWARN)
             sys.exit(1)
 
         success = release(load_project(project_path))
