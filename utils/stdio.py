@@ -15,11 +15,13 @@ class Printer:
     def __init__(self, colorize):
         self.colorize = colorize
 
-    def print(self, text, color=None):
+    def pprint(self, text=None, color=None):
         if color is not None and self.colorize:
             print(color, text, CRESET)
-        else:
+        elif text is not None:
             print(text)
+        else:
+            print('')
 
 
 def ppexec(cmd):
