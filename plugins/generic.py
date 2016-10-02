@@ -18,7 +18,7 @@ class Generic:
         else:
             composercmd = "composer"
 
-        return stdio.ppexec(composercmd + " -n install --optimize-autoloader")
+        return stdio.ppexec(composercmd + " -n install --optimize-autoloader --no-ansi")
 
     def bower_pass(self, project):
         return stdio.ppexec("bower install --allow-root")
