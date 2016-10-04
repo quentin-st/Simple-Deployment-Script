@@ -1,5 +1,6 @@
 from subprocess import Popen, PIPE, STDOUT
 import sys
+import string
 
 style_none = 0
 style_bold = 1
@@ -102,21 +103,29 @@ class Printer:
             if line == empty_line:
                 continue
 
-            encoding = sys.stdout.encoding
+            # Decode command output
+            decoded = None
+            encodings = [sys.stdout.encoding, 'utf-8', 'windows-1252']
 
-            if encoding is None:
-                encoding = 'utf-8'
+            # Try one encoding at a time
+            for encoding in encodings:
+                if encoding is None:
+                    continue
 
-            try:
-                raw_output = line.decode(encoding)
-            except (UnicodeEncodeError, UnicodeDecodeError):
-                # Try again with another encoding
                 try:
-                    raw_output = line.decode('windows-1252')
+                    decoded = line.decode(encoding)
+                    break
                 except (UnicodeEncodeError, UnicodeDecodeError):
-                    raw_output = None
+                    # Ignored
+                    pass
 
-            self.pass_output(pass_name, raw_output if raw_output is not None else "?")
+            if decoded is None:
+                decoded = '?'
+
+            # Strip non-printable chars
+            decoded = ''.join(filter(lambda x: x in string.printable, decoded))
+
+            self.pass_output(pass_name, decoded)
 
         # Wait for process to finish so we can get its return value
         p.wait()
