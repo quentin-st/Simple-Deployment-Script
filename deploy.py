@@ -162,7 +162,7 @@ def release(project):
         forced_passes = conf.get("passes", "").split()
 
     # Determine plugin-specific passes
-    plugin = types[project_type]()
+    plugin = types[project_type](printer)
 
     deploy_passes = []
 

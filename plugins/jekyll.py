@@ -1,4 +1,3 @@
-from utils import stdio
 from plugins import generic
 
 
@@ -14,4 +13,4 @@ class Jekyll(generic.Generic):
         return generic_passes + ['build']
 
     def build_pass(self, project):
-        return stdio.ppexec("jekyll build")
+        return self.printer.pexec('build', "jekyll build")

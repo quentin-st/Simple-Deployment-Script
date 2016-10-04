@@ -1,5 +1,3 @@
-import os
-from utils import stdio
 from plugins import generic
 
 
@@ -8,24 +6,26 @@ def register_variants():
 
 
 class Symfony(generic.Generic):
+    app_console = None
+
     def register_passes(self):
         generic_passes = generic.Generic.register_passes(self)
         return generic_passes + ['composer', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
 
     def assets_pass(self, project):
-        return stdio.ppexec(self.app_console + " assets:install")
+        return self.printer.pexec('assets', self.app_console + " assets:install")
 
     def assetic_pass(self, project):
-        return stdio.ppexec(self.app_console + " assetic:dump")
+        return self.printer.pexec('assetic', self.app_console + " assetic:dump")
 
     def cache_pass(self, project):
-        return stdio.ppexec(self.app_console + " cache:clear")
+        return self.printer.pexec('cache', self.app_console + " cache:clear")
 
     def liip_imagine_cache_pass(self, project):
-        return stdio.ppexec(self.app_console + " liip:imagine:cache:remove")
+        return self.printer.pexec('liip_imagine_cache', self.app_console + " liip:imagine:cache:remove")
 
     def update_database_schema_pass(self, project):
-        return stdio.ppexec(self.app_console + " doctrine:schema:update --force")
+        return self.printer.pexec('update_database_schema', self.app_console + " doctrine:schema:update --force")
 
 
 class Symfony2(Symfony):

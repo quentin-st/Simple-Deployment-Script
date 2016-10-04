@@ -1,5 +1,4 @@
 import os
-from utils import stdio
 
 
 def register_variants():
@@ -8,6 +7,10 @@ def register_variants():
 
 class Generic:
     key_name = "generic"
+    printer = None
+
+    def __init__(self, printer):
+        self.printer = printer
 
     def register_passes(self):
         return ['?composer', '?npm', '?bower', '?scss', '?gulp']
@@ -18,10 +21,10 @@ class Generic:
         else:
             composercmd = "composer"
 
-        return stdio.ppexec(composercmd + " -n install --optimize-autoloader --no-ansi")
+        return self.printer.pexec('composer', composercmd + " -n install --optimize-autoloader --no-ansi")
 
     def bower_pass(self, project):
-        return stdio.ppexec("bower install --allow-root")
+        return self.printer.pexec('bower', "bower install --allow-root")
 
     def scss_pass(self, project):
         # Let's find SCSS files inside this project
@@ -39,7 +42,7 @@ class Generic:
                 if file.endswith(".scss") and not file.startswith("_"):  # Exclude SCSS part files (_part.scss)
                     abs_path = os.path.join(root, file)
                     command = "sass {} {} --style compressed".format(abs_path, abs_path.replace('.scss', '.css'))
-                    e = stdio.ppexec(command)
+                    e = self.printer.pexec('scss', command)
 
                     if e != 0:
                         return_code = e
@@ -47,7 +50,7 @@ class Generic:
         return return_code
 
     def gulp_pass(self, project):
-        return stdio.ppexec("gulp")
+        return self.printer.pexec('gulp', "gulp")
 
     def npm_pass(self, project):
-        return stdio.ppexec("npm install")
+        return self.printer.pexec('npm', "npm install")
