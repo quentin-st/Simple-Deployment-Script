@@ -289,7 +289,8 @@ try:
         matches = []
 
         while len(matches) == 0:
-            matches = regex.findall(input("? "))
+            user_input = input("? ") if sys.version_info.major == 3 else raw_input("? ")
+            matches = regex.findall(user_input)
 
             if len(matches) > 0:
                 for match in matches:
