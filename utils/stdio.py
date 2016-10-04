@@ -1,49 +1,123 @@
 from subprocess import Popen, PIPE, STDOUT
 import sys
 
-CRESET = "\033[0m"
-CDIM   = "\033[2m"
-CBOLD  = "\033[1m"
-LGREEN = "\033[92m"
-LWARN  = "\033[93m"
-LRED   = "\033[91m"
+style_none = 0
+style_bold = 1
+style_underline = 2
+style_dim = 2
+
+fg_color_white = 30
+fg_color_red = 31
+fg_color_green = 32
+fg_color_orange = 33
+
+bg_color_default = 40
+bg_color_red = 41
+bg_color_green = 42
+bg_color_orange = 43
 
 
 class Printer:
     colorize = True
+    print_verbose = True
 
-    def __init__(self, colorize):
+    def __init__(self, colorize, verbose):
         self.colorize = colorize
+        self.print_verbose = verbose
 
-    def pprint(self, text=None, color=None):
-        if color is not None and self.colorize:
-            print(color, text, CRESET)
-        elif text is not None:
-            print(text)
+    def _print(self, text=None, foreground=None, background=None, style=style_none, line_return=True):
+        if text is None:
+            sys.stdout.write('')
+        elif not self.colorize:
+            sys.stdout.write(text)
         else:
-            print('')
+            f = str(style)
+            if foreground is not None:
+                f += ';' + str(foreground)
 
+                if background is not None:
+                    f += ';' + str(background)
 
-def ppexec(cmd):
-    print("    [$ {}]".format(cmd))
-    empty_line = bytes()
+            sys.stdout.write('\x1b[{}m{}\x1b[0m'.format(f, text))
 
-    p = Popen(cmd, stdout=PIPE, stderr=STDOUT, shell=True)
-    for line in p.stdout:
-        line = line.strip()
-        if line == empty_line:
-            continue
+        if line_return:
+            sys.stdout.write('\n')
 
-        encoding = sys.stdout.encoding
+        sys.stdout.flush()
 
-        if encoding is None:
-            encoding = 'utf-8'
+    def info(self, text, bold=False):
+        self._print(
+            text=text,
+            style=style_none if bold is False else style_bold
+        )
 
-        try:
-            print(CDIM + "    " + line.decode(encoding) + CRESET)
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            print(CDIM + "    " + line.decode('windows-1252') + CRESET)
+    def success(self, text):
+        self._print(
+            text=text,
+            foreground=fg_color_green,
+            style=style_bold
+        )
 
-    # Wait for process to finish so we can get its return value
-    p.wait()
-    return p.returncode
+    def warning(self, text):
+        self._print(
+            text=text,
+            foreground=fg_color_orange
+        )
+
+    def error(self, text):
+        self._print(
+            text=text,
+            foreground=fg_color_red,
+            style=style_bold
+        )
+
+    def pass_output(self, pass_name, text):
+        # Print pass name
+        self._print(
+            text=' {} '.format(pass_name),
+            foreground=fg_color_white,
+            background=bg_color_green,
+            line_return=False
+        )
+
+        # Then print text, with line return
+        self._print('  {}'.format(text))
+
+    def verbose(self, text):
+        if not self.print_verbose:
+            return
+
+        self._print(
+            text=text,
+            style=style_dim
+        )
+
+    def pexec(self, pass_name, cmd):
+        self.pass_output(pass_name, "[$ {}]".format(cmd))
+        empty_line = bytes()
+
+        p = Popen(cmd, stdout=PIPE, stderr=STDOUT, shell=True)
+        for line in p.stdout:
+            line = line.rstrip()
+            if line == empty_line:
+                continue
+
+            encoding = sys.stdout.encoding
+
+            if encoding is None:
+                encoding = 'utf-8'
+
+            try:
+                raw_output = line.decode(encoding)
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                # Try again with another encoding
+                try:
+                    raw_output = line.decode('windows-1252')
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    raw_output = None
+
+            self.pass_output(pass_name, raw_output if raw_output is not None else "?")
+
+        # Wait for process to finish so we can get its return value
+        p.wait()
+        return p.returncode

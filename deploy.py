@@ -12,8 +12,7 @@ import re
 
 from operator import itemgetter
 
-from utils import stdio
-from utils.stdio import CRESET, CDIM, CBOLD, LGREEN, LWARN, LRED, Printer
+from utils.stdio import Printer
 import plugins
 # The following line is necessary for project types to be found
 from plugins import *
@@ -38,7 +37,7 @@ def find_projects():
     projects = []
 
     # Recursively find config file in ROOT_DIR
-    printer.pprint("Scanning {} for {} files".format(sanitized_root_dir, CONFIG_FILE_NAME), CDIM)
+    printer.verbose("Scanning {} for {} files".format(sanitized_root_dir, CONFIG_FILE_NAME))
     for root, dirs, files in os.walk(sanitized_root_dir):
         for file in files:
             if file == CONFIG_FILE_NAME or file == CONFIG_FILE_NAME_DEPRECATED:
@@ -47,18 +46,19 @@ def find_projects():
                 conf_malformed = True if project['conf'] is None else False
                 conf_deprecated = file == CONFIG_FILE_NAME_DEPRECATED
 
-                color = CDIM+LWARN if conf_malformed or conf_deprecated else CDIM
-                suffix = ''
-                if conf_malformed:
-                    suffix = '(malformed)'
-                elif conf_deprecated:
-                    suffix = '(deprecated conf file format)'
+                text = "\tFound ~/{}".format(os.path.relpath(file_path, sanitized_root_dir))
 
-                printer.pprint("\tFound ~/{} {}".format(os.path.relpath(file_path, sanitized_root_dir), suffix), color)
+                if conf_malformed:
+                    text += ' (malformed)'
+                elif conf_deprecated:
+                    text += ' (deprecated conf file format)'
+
+                if conf_malformed or conf_deprecated:
+                    printer.warning(text)
+                else:
+                    printer.info(text)
 
                 projects.append(project)
-
-    printer.pprint()
 
     # Sort projects by name alphabetically
     return sorted(projects, key=itemgetter('name'))
@@ -113,13 +113,13 @@ def release(project):
     conf_path = project['conf_path']
 
     if conf_path.endswith(CONFIG_FILE_NAME_DEPRECATED):
-        printer.pprint("Warning: '{}' as filename is deprecated, consider renaming it to '{}'.".format(
+        printer.warning("Warning: '{}' as conf filename is deprecated, consider renaming it to '{}'.".format(
             CONFIG_FILE_NAME_DEPRECATED, CONFIG_FILE_NAME
-        ), LWARN)
+        ))
 
     # Conf is malformed
     if conf is None:
-        printer.pprint("\nMalformed config file ({})".format(conf_path), CBOLD + LRED)
+        printer.error("\nMalformed config file ({})".format(conf_path))
         return False
 
     # Read conf
@@ -127,12 +127,12 @@ def release(project):
     branch = conf.get("branch", "release")
     forced_passes = conf.get("passes", "").split()
 
-    printer.pprint("\nDeploying project {} ({})".format(project_name, branch), CBOLD + LGREEN)
+    printer.info("\nDeploying project {} ({})".format(project_name, branch), bold=True)
 
     # Check the project type
     types = get_supported_project_types()
     if project_type not in types:
-        printer.pprint("Unknown project type \"{}\".".format(project_type), CBOLD + LWARN)
+        printer.error("Unknown project type \"{}\".".format(project_type))
         return False
 
     # Let's go!
@@ -140,17 +140,17 @@ def release(project):
 
     # Check if either git_checkout or git_pull special passes are disabled
     if "-git_checkout" not in forced_passes:
-        e = os.system("git checkout " + branch)
+        e = printer.pexec('git', "git checkout {}".format(branch))
 
         if e != 0:
-            printer.pprint('git checkout command finished with non-zero exit value, aborting deploy', CBOLD + LWARN)
+            printer.error('git checkout command finished with non-zero exit value, aborting deploy')
             return False
 
     if "-git_pull" not in forced_passes:
-        e = os.system("git pull")
+        e = printer.pexec('git', "git pull")
 
         if e != 0:
-            printer.pprint('git pull command finished with non-zero exit value, aborting deploy', CBOLD + LWARN)
+            printer.error('git pull command finished with non-zero exit value, aborting deploy')
             return False
 
         # Get an updated version of the conf, if the config file has changed after the pull
@@ -180,36 +180,34 @@ def release(project):
             deploy_passes.append(pass_name)
 
     if len(deploy_passes) > 0:
-        printer.pprint("\n==> Deployment starting with passes: {}".format(", ".join(deploy_passes)), CBOLD+LGREEN)
+        printer.success("\nDeployment starting with passes: {}".format(", ".join(deploy_passes)))
 
         # Start env-specific passes
         npasses = len(deploy_passes)
         for i, pass_name in enumerate(deploy_passes):
-            printer.pprint("\n==> Pass {} of {} [{}]".format(i+1, npasses, pass_name), CBOLD)
+            printer.info("\nPass {} of {} [{}]".format(i+1, npasses, pass_name), True)
             e = getattr(plugin, pass_name + "_pass")(project)
 
             if e != 0:
-                printer.pprint("Pass '{}' finished with non-zero ({}) exit value, aborting deploy".format(
+                printer.error("Pass '{}' finished with non-zero ({}) exit value, aborting deploy".format(
                     pass_name, e
-                ), CBOLD + LWARN)
+                ))
                 return False
 
     # Execute custom commands
     commands = conf.get("commands", [])
     if len(commands) > 0:
-        printer.pprint("\nExecuting custom commands", CBOLD + LGREEN)
+        printer.success("\nExecuting custom commands")
 
         for command in commands:
-            e = stdio.ppexec(command)
+            e = printer.pexec('commands', command)
 
             if e != 0:
-                printer.pprint("Custom command finished with non-zero ({}) exit value, aborting deploy.".format(
-                    e
-                ), CBOLD + LWARN)
+                printer.error("Custom command finished with non-zero ({}) exit value, aborting deploy.".format(e))
                 return False
 
     # The End
-    printer.pprint("\n==> {} successfully deployed. Have an A1 day!\n".format(project_path), CBOLD+LGREEN)
+    printer.success("\n{} successfully deployed. Have an A1 day!\n".format(project_path))
     return True
 
 
@@ -224,33 +222,33 @@ try:
     parser.add_argument('--project', default='ask_for_it')
     parser.add_argument('-a', '--all', action='store_true')
     parser.add_argument('--no-color', action='store_true', dest='no_color')
+    parser.add_argument('--not-verbose', action='store_true', dest='not_verbose')
     args = parser.parse_args()
 
-    printer = Printer(not args.no_color)
+    printer = Printer(not args.no_color, not args.not_verbose)
 
     if args.self_update:
         # cd to own directory
         self_dir = os.path.dirname(os.path.realpath(__file__))
 
         if not os.path.isdir(os.path.join(self_dir, '.git')):
-            printer.pprint("Cannot self-update: missing .git directory", CDIM+LWARN)
+            printer.error("Cannot self-update: missing .git directory")
             sys.exit(1)
 
         os.chdir(self_dir)
         os.system("git pull")
 
-        printer.pprint()
-        printer.pprint("Updated to the latest version", LGREEN)
+        printer.success("\nUpdated to the latest version")
     elif args.path is not None:
         project_path = os.path.abspath(os.path.join(os.curdir, args.path))
 
         if not os.path.isdir(project_path):
-            printer.pprint("This is not a valid directory")
+            printer.error("This is not a valid directory")
             sys.exit(1)
 
         if not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME))\
                 and not os.path.isfile(os.path.join(project_path, CONFIG_FILE_NAME_DEPRECATED)):
-            printer.pprint("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
+            printer.error("There is no {} file in this directory.".format(CONFIG_FILE_NAME))
             sys.exit(1)
 
         # Load project
@@ -265,26 +263,26 @@ try:
             for i, project in enumerate(projects):
                 release(project)
         else:
-            printer.pprint("There is no suitable project in {}".format(sanitized_root_dir))
+            printer.error("There is no suitable project in {}".format(sanitized_root_dir))
 
     elif args.project == 'ask_for_it':
         projects = find_projects()
 
         if len(projects) == 0:
-            printer.pprint("No project found in {}, exiting.".format(ROOT_DIR))
+            printer.error("No project found in {}, exiting.".format(ROOT_DIR))
             sys.exit(1)
 
-        printer.pprint("Please select a project to deploy (^C to exit): '1' or '1, 3, 5'")
+        printer.info("Please select a project to deploy (^C to exit): '1' or '1, 3, 5'")
 
         # List projects
         for i, project in enumerate(projects):
             malformed_conf = True if project['conf'] is None else False
 
             if malformed_conf:
-                printer.pprint("\t[{}] {} (malformed conf)".format(str(i), project['name']), CDIM+LWARN)
+                printer.warning("\t[{}] {} (malformed conf)".format(str(i), project['name']))
             else:
                 target_branch = project['conf'].get("branch", "release")
-                printer.pprint("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
+                printer.info("\t[{}] {} ({})".format(str(i), project['name'], target_branch))
 
         # Read user input
         regex = re.compile('(-?\d+)(,\s*-?d+)?')
@@ -299,9 +297,9 @@ try:
                     if 0 <= index < len(projects):
                         release(projects[index])
                     else:
-                        printer.pprint("Invalid project index {}, ignoring".format(index))
+                        printer.warning("Invalid project index {}, ignoring".format(index))
             else:
-                printer.pprint("Not a valid sequence. Use either '1' or '1, 3, 5' instead")
+                printer.error("Not a valid sequence. Use either '1' or '1, 3, 5' instead")
     else:
         projects = find_projects()
         project_path = os.path.join(sanitized_root_dir, args.project)
@@ -309,14 +307,15 @@ try:
         results = [project for project in projects if project['path'] == project_path]
 
         if len(results) == 0:
-            printer.pprint("No project found with this name. Re-run this script without args to list all projects", CBOLD+LRED)
+            printer.error("No project found with this name. Re-run this script without args to list all projects")
             sys.exit(1)
         elif len(results) > 1:
-            printer.pprint("Ambiguous project name, re-run this script without args or specify absolute path", CBOLD+LWARN)
+            printer.error("Ambiguous project name, re-run this script without args or specify absolute path")
             sys.exit(1)
 
         success = release(load_project(project_path))
         sys.exit(0 if success else 1)
 except KeyboardInterrupt:
-    printer.pprint("\n^C signal caught, exiting")
+    # noinspection PyUnboundLocalVariable
+    printer.info("\n^C signal caught, exiting")
     sys.exit(1)
