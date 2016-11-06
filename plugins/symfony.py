@@ -13,7 +13,7 @@ class Symfony(generic.Generic):
         return generic_passes + ['composer', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
 
     def assets_pass(self, project):
-        return self.printer.pexec('assets', self.app_console + " assets:install")
+        return self.printer.pexec('assets', self.app_console + " assets:install --symlink")
 
     def assetic_pass(self, project):
         return self.printer.pexec('assetic', self.app_console + " assetic:dump")
