@@ -199,17 +199,21 @@ def release(project):
     # Execute custom commands
     commands = conf.get("commands", [])
     if len(commands) > 0:
-        printer.success("\nExecuting custom commands")
+        printer.info("\nExecuting custom commands")
 
         for command in commands:
-            e = printer.pexec('commands', command)
+            e = printer.pexec('cmds', command)
 
             if e != 0:
                 printer.error("Custom command finished with non-zero ({}) exit value, aborting deploy.".format(e))
                 return False
 
+            print()
+
     # The End
-    printer.success("\n{} successfully deployed. Have an A1 day!\n".format(project_path))
+    printer.success("\n{} successfully deployed. Have an A1 day!".format(project_path))
+    printer.pexec('git', 'git log --oneline -1')
+
     return True
 
 
