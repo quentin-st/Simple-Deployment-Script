@@ -8,6 +8,10 @@ def register_variants():
 class Symfony(generic.Generic):
     app_console = None
 
+    def __init__(self, printer, cli_args):
+        generic.Generic.__init__(self, printer, cli_args)
+        self.app_console = self.app_console.replace('__env__', cli_args.env)
+
     def register_passes(self):
         generic_passes = generic.Generic.register_passes(self)
         return generic_passes + ['composer', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
@@ -30,9 +34,9 @@ class Symfony(generic.Generic):
 
 class Symfony2(Symfony):
     key_name = "symfony2"
-    app_console = 'php app/console -n --env=prod'
+    app_console = 'php app/console -n --env=__env__'
 
 
 class Symfony3(Symfony):
     key_name = "symfony3"
-    app_console = 'php bin/console -n --env=prod'
+    app_console = 'php bin/console -n --env=__env__'

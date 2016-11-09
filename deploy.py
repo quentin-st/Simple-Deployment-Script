@@ -146,6 +146,8 @@ def release(project):
             printer.error('git checkout command finished with non-zero exit value, aborting deploy')
             return False
 
+    print('')
+
     if "-git_pull" not in forced_passes:
         e = printer.pexec('git', "git pull")
 
@@ -162,7 +164,7 @@ def release(project):
         forced_passes = conf.get("passes", "").split()
 
     # Determine plugin-specific passes
-    plugin = types[project_type](printer)
+    plugin = types[project_type](printer, args)
 
     deploy_passes = []
 
@@ -215,14 +217,17 @@ def release(project):
 try:
     sanitized_root_dir = os.path.expanduser(ROOT_DIR.rstrip('/'))
 
-    # Check command line argument
+    # Command line argument
     parser = argparse.ArgumentParser(description='Easily deploy projects')
+    # Script args
     parser.add_argument('--self-update', action='store_true', dest='self_update')
     parser.add_argument('path', nargs='?')
     parser.add_argument('--project', default='ask_for_it')
     parser.add_argument('-a', '--all', action='store_true')
     parser.add_argument('--no-color', action='store_true', dest='no_color')
     parser.add_argument('--not-verbose', action='store_true', dest='not_verbose')
+    # Plugin-specific args
+    parser.add_argument('--env', default='prod')  # Symfony
     args = parser.parse_args()
 
     printer = Printer(not args.no_color, not args.not_verbose)

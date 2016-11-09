@@ -8,9 +8,11 @@ def register_variants():
 class Generic:
     key_name = "generic"
     printer = None
+    cli_args = {}
 
-    def __init__(self, printer):
+    def __init__(self, printer, cli_args):
         self.printer = printer
+        self.cli_args = cli_args
 
     def register_passes(self):
         return ['?composer', '?npm', '?bower', '?scss', '?gulp']
