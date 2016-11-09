@@ -14,7 +14,7 @@ class Symfony(generic.Generic):
 
     def register_passes(self):
         generic_passes = generic.Generic.register_passes(self)
-        return generic_passes + ['composer', 'assets', 'assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
+        return generic_passes + ['composer', 'assets', '?assetic', 'cache', '?liip_imagine_cache', '?update_database_schema']
 
     def assets_pass(self, project):
         return self.printer.pexec('assets', self.app_console + " assets:install --symlink")

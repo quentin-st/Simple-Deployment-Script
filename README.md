@@ -173,13 +173,14 @@ bower -v
 
 ### Symfony 2 and 3
 
-| Pass name & order  | Enabled by default | Description                                                       |
-| ------------------ | ------------------ | ----------------------------------------------------------------- |
-| composer           | ✓                  | Runs `composer install`                                           |
-| assets             | ✓                  | Dumps bundles assets to web directory (`asset:install`)           |
-| assetic            | ✓                  | Runs `assetic:dump` command                                       |
-| cache              | ✓                  | Clears the cache                                                  |
-| liip_imagine_cache |                    | Clears Liip's Imagine Bundle cache                                |
+| Pass name & order      | Enabled by default | Description                                                   |
+| ---------------------- | ------------------ | ------------------------------------------------------------- |
+| composer               | ✓                  | Runs `composer install`                                       |
+| assets                 | ✓                  | Dumps bundles assets to web directory (`asset:install`)       |
+| assetic                |                    | Runs `assetic:dump` command                                   |
+| cache                  | ✓                  | Clears the cache                                              |
+| liip_imagine_cache     |                    | Clears Liip's Imagine Bundle cache                            |
+| update_database_schema |                    | Runs `doctrine:schema:update --force` command                 |
 
 #### Permissions
 You have to properly setup permissions in order to avoid errors. You could use the ACLs (a more advanced way to manage permissions than POSIX file modes):
