@@ -23,7 +23,18 @@ class Generic:
         else:
             composercmd = "composer"
 
-        return self.printer.pexec('composer', composercmd + " -n install --optimize-autoloader --no-ansi")
+        args = [
+            '-n',
+            '--no-dev',
+            'install',
+            '--optimize-autoloader',
+            '--no-ansi'
+        ]
+
+        if self.cli_args.env in ['dev', 'test']:
+            args.remove('--no-dev')
+
+        return self.printer.pexec('composer', "{} {}".format(composercmd, ' '.join(args)))
 
     def bower_pass(self, project):
         return self.printer.pexec('bower', "bower install --allow-root")
