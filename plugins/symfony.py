@@ -1,3 +1,4 @@
+import os
 from plugins import generic
 
 
@@ -11,6 +12,9 @@ class Symfony(generic.Generic):
     def __init__(self, printer, cli_args):
         generic.Generic.__init__(self, printer, cli_args)
         self.app_console = self.app_console.replace('__env__', cli_args.env)
+
+        # Define SYMFONY_ENV environment variable for composer post-install commands
+        os.environ['SYMFONY_ENV'] = cli_args.env
 
     def register_passes(self):
         generic_passes = generic.Generic.register_passes(self)
