@@ -64,13 +64,13 @@ vim /var/www/project/deploy.json
     **Type**: `string`  
     **Default value**: `` *(empty string)*
 
- - `commands`
+ - `pre-deploy-commands` / `post-deploy-commands`
     
     You can run custom commands that are either not handled by this scripts, or project-specific. Your deploy.json
-    file must contain all commands in the `commands` array:
+    file must contain all commands in either `pre-deploy-commands` / `post-deploy-commands` array:
     
     ```json
-    "commands": [
+    "post-deploy-commands": [
         "ls -l",
         "git status"
     ]

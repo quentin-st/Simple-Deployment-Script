@@ -2,8 +2,11 @@
     "projectType":  "symfony2",
     "branch":       "release",
     "passes":       "+scss",
-    "commands": [
+    "pre-deploy-commands": [
         "ls -l",
+        "git status"
+    ],
+    "post-deploy-commands": [
         "git status"
     ]
 }

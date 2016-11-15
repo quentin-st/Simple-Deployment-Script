@@ -161,13 +161,27 @@ def release(project):
             printer.error('git pull command finished with non-zero exit value, aborting deploy')
             return False
 
-        # Get an updated version of the conf, if the config file has changed after the pull
-        # Handle case where conf_path gets renamed to non-deprecated version
-        if not os.path.isfile(conf_path):
-            project['conf_path'] = conf_path = os.path.join(project_path, CONFIG_FILE_NAME)
+    # Get an updated version of the conf, if the config file has changed after the pull
+    # Handle case where conf_path gets renamed to non-deprecated version
+    if not os.path.isfile(conf_path):
+        project['conf_path'] = conf_path = os.path.join(project_path, CONFIG_FILE_NAME)
 
-        conf = parse_conf(conf_path)
-        forced_passes = conf.get("passes", "").split()
+    conf = parse_conf(conf_path)
+    forced_passes = conf.get("passes", "").split()
+
+    # Execute pre-deploy commands
+    pre_deploy_commands = conf.get("pre-deploy-commands", [])
+    if len(pre_deploy_commands) > 0:
+        printer.info("\nExecuting pre-deploy commands", True)
+
+        for command in pre_deploy_commands:
+            e = printer.pexec('pre-deploy', command)
+
+            if e != 0:
+                printer.error("Custom command finished with non-zero ({}) exit value, aborting deploy.".format(e))
+                return False
+
+            print()
 
     # Determine plugin-specific passes
     plugin = types[project_type](printer, args)
@@ -203,12 +217,17 @@ def release(project):
                 return False
 
     # Execute custom commands
-    commands = conf.get("commands", [])
-    if len(commands) > 0:
-        printer.info("\nExecuting custom commands")
+    post_deploy_commands = conf.get("post-deploy-commands", conf.get("commands", []))
+    if len(post_deploy_commands) > 0:
+        printer.info("\nExecuting post-deploy commands", True)
 
-        for command in commands:
-            e = printer.pexec('cmds', command)
+        # Display a warning for deprecated "commands" attribute
+        if len(conf.get("commands", [])) > 0:
+            printer.warning(
+                "Setting post-deploy commands with \"commands\" key is deprecated, use \"post-deploy-commands\" instead")
+
+        for command in post_deploy_commands:
+            e = printer.pexec('post-deploy', command)
 
             if e != 0:
                 printer.error("Custom command finished with non-zero ({}) exit value, aborting deploy.".format(e))
