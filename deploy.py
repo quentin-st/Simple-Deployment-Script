@@ -218,7 +218,7 @@ def release(project):
 
     # The End
     printer.success("\n{} successfully deployed. Have an A1 day!".format(project_path))
-    printer.pexec('git', 'git log --oneline -1')
+    printer.pexec('git', 'git log {} --oneline -1'.format(git_args).replace('  ', ' '))
 
     return True
 
