@@ -138,9 +138,15 @@ def release(project):
     # Let's go!
     os.chdir(project_path)
 
+    git_args = ''
+    if args.git_work_tree:
+        git_args += ' --work-tree="{}"'.format(args.git_work_tree)
+    if args.git_dir:
+        git_args += ' --git-dir="{}"'.format(args.git_dir)
+
     # Check if either git_checkout or git_pull special passes are disabled
     if "-git_checkout" not in forced_passes:
-        e = printer.pexec('git', "git checkout {}".format(branch))
+        e = printer.pexec('git', "git {} checkout -f {}".format(git_args, branch).replace('  ', ' '))
 
         if e != 0:
             printer.error('git checkout command finished with non-zero exit value, aborting deploy')
@@ -149,7 +155,7 @@ def release(project):
     print('')
 
     if "-git_pull" not in forced_passes:
-        e = printer.pexec('git', "git pull")
+        e = printer.pexec('git', "git {} pull".format(git_args).replace('  ', ' '))
 
         if e != 0:
             printer.error('git pull command finished with non-zero exit value, aborting deploy')
@@ -230,6 +236,8 @@ try:
     parser.add_argument('-a', '--all', action='store_true')
     parser.add_argument('--no-color', action='store_true', dest='no_color')
     parser.add_argument('--not-verbose', action='store_true', dest='not_verbose')
+    parser.add_argument('--git-work-tree', dest='git_work_tree')
+    parser.add_argument('--git-dir', dest='git_dir')
     # Plugin-specific args
     parser.add_argument('--env', default='prod')  # Symfony
     args = parser.parse_args()
