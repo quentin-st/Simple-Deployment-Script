@@ -146,7 +146,7 @@ def release(project):
 
     # Check if either git_checkout or git_pull special passes are disabled
     if "-git_checkout" not in forced_passes:
-        e = printer.pexec('git', "git {} checkout {}".format(git_args, branch).replace('  ', ' '))
+        e = printer.pexec('git', "git {} checkout -f {}".format(git_args, branch).replace('  ', ' '))
 
         if e != 0:
             printer.error('git checkout command finished with non-zero exit value, aborting deploy')
